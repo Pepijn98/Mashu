@@ -124,7 +124,11 @@ async function handleCommand(msg, dm) {
             }
 
             if (missingPermissions.length > 0) {
-                return await msg.channel.createMessage(`The bot is missing these required permissions: ${missingPermissions.join(", ")}`);
+                try {
+                    return await msg.channel.createMessage(`The bot is missing these required permissions: ${missingPermissions.join(", ")}`);
+                } catch (e) {
+                    return;
+                }
             }
         }
 
