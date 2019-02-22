@@ -34,7 +34,9 @@
 
 ### 3. Argument checks
 
-### 4. Commands
+### 4. Change commands to classes
+
+### . Commands
 - warn
 - baninfo
 - kickinfo
