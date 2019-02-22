@@ -5,8 +5,8 @@ const fs = require("fs");
 
 /**
  * @typedef {Object} Config
- * @property {string}  token        - The bot's token
- * @property {string}  prefix       - The bot's global prefix
+ * @property {string}         token        - The bot's token
+ * @property {string}         prefix       - The bot's global prefix
  * @property {string|number}  embedColor   - Default embed color
  */
 
@@ -134,12 +134,10 @@ client.on("messageCreate", async (msg) => {
     if (!msg.author) return; // Probably system message
     if (msg.author.discriminator === "0000") return; // Probably a webhook
 
-    if (!msg.channel.guild && msg.author.id !== client.user.id) {
-        if (msg.content.startsWith(config.prefix)) {
+    if (msg.content.startsWith(config.prefix)) {
+        if (!msg.channel.guild && msg.author.id !== client.user.id) {
             await handleCommand(msg, true);
-        }
-    } else if (msg.channel.guild) {
-        if (msg.content.startsWith(config.prefix)) {
+        } else if (msg.channel.guild) {
             await handleCommand(msg, false);
         }
     }
