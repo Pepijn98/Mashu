@@ -1,0 +1,41 @@
+{
+  "name": "chloe",
+  "version": "0.0.1",
+  "description": "Attempt to create a moderation bot",
+  "author": {
+    "email": "root@kurozeropb.info",
+    "name": "KurozeroPB",
+    "url": "https://kurozeropb.info"
+  },
+  "main": "src/index.js",
+  "license": "MIT",
+  "keywords": [],
+  "homepage": "https://kurozeropb.info",
+  "bugs": {
+    "email": "root@kurozeropb.info",
+    "url": "https://github.com/KurozeroPB/chloe/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KurozeroPB/chloe.git"
+  },
+  "scripts": {
+    "lint": "eslint --ext .js --ignore-path .gitignore .",
+    "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
+    "start": "cross-env NODE_ENV=production yarn lint && node src/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon src/index.js --watch src"
+  },
+  "dependencies": {
+    "bufferutil": "^4.0.1",
+    "cross-env": "^5.2.0",
+    "eris": "abalabahaha/eris#dev",
+    "erlpack": "abalabahaha/erlpack",
+    "mongoose": "^5.4.14",
+    "toml": "^3.0.0",
+    "zlib-sync": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.13.0",
+    "nodemon": "^1.18.9"
+  }
+}
