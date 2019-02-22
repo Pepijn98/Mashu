@@ -23,7 +23,8 @@
     "kicked": [
         {
             "userId": "",
-            "reason": ""
+            "reason": "",
+            "count": 0
         }
     ]
 }
@@ -31,7 +32,9 @@
 
 ### 2. Logging to log channel
 
-### 3. Commands
+### 3. Argument checks
+
+### 4. Commands
 - warn
 - baninfo
 - kickinfo

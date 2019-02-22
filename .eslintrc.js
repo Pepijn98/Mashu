@@ -15,7 +15,7 @@ module.exports = {
             "error",
             "never"
         ],
-        "array-callback-return": "off",
+        "array-callback-return": "error",
         "array-element-newline": "error",
         "arrow-body-style": "off",
         "arrow-parens": [

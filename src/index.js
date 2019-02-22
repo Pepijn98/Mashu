@@ -1,13 +1,18 @@
 const Eris = require("eris");
+const mongoose = require("mongoose");
 const TOML = require("toml");
 const { join } = require("path");
 const fs = require("fs");
 
 /**
  * @typedef {Object} Config
- * @property {string}         token        - The bot's token
- * @property {string}         prefix       - The bot's global prefix
- * @property {string|number}  embedColor   - Default embed color
+ * @property {string}         token             - The bot's token
+ * @property {string}         prefix            - The bot's global prefix
+ * @property {string|number}  embedColor        - Default embed color
+ * @property {Object}         database          - Database settings
+ * @property {string}         database.host
+ * @property {number}         database.port
+ * @property {string}         database.name
  */
 
 /**
@@ -23,6 +28,34 @@ const fs = require("fs");
 /**
  * @typedef {Object<string, Command>} Commands  - An object with all the available commands
  */
+
+ const warned = new mongoose.Schema({
+     "userId": String,
+     "count": Number,
+     "reasons": [String]
+ });
+
+const banned = new mongoose.Schema({
+    "userId": String,
+    "reason": String,
+    "count": Number
+});
+
+const kicked = new mongoose.Schema({
+    "userId": String,
+    "reason": String,
+    "count": Number
+});
+
+const guildSchema = new mongoose.Schema({
+    "id": String,
+    "logChannel": String,
+    "warned": [warned],
+    "banned": [banned],
+    "kicked": [kicked]
+});
+
+const Guild = mongoose.model("Guild", guildSchema);
 
 const toml = fs.readFileSync(join(__dirname, "..", "config.toml"));
 /** @type {Config} */
@@ -70,8 +103,12 @@ async function handleCommand(msg, dm) {
     const args = parts.splice(1);
     const context = {
         config: config,
-        database: {}
+        database: {
+            guild: Guild
+        }
     };
+
+    // TODO: Implement argument checks
 
     // Only check for permission if the command is used in a guild
     if (msg.channel.guild) {
@@ -124,7 +161,8 @@ async function handleCommand(msg, dm) {
     }
 }
 
-client.on("ready", () => {
+client.on("ready", async () => {
+    await mongoose.connect(`mongodb://${config.database.host}:${config.database.port}/${config.database.name}`, { useNewUrlParser: true });
     console.log("Ready!");
     ready = true;
 });
@@ -141,6 +179,12 @@ client.on("messageCreate", async (msg) => {
             await handleCommand(msg, false);
         }
     }
+});
+
+client.on("guildCreate", async (guild) => {
+    // TODO: Add guild to database
+    const newGuild = new Guild({ "id": guild.id, "logChannel": "" });
+    await newGuild.save();
 });
 
 client.connect().catch(console.error);
