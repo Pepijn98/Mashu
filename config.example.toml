@@ -1,3 +1,9 @@
 token = ""
 prefix = "c/"
 embedColor = "0xDC143C"
+
+
+[database]
+host = "localhost"
+port = 27017
+name = ""
