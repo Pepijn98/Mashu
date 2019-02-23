@@ -7,32 +7,8 @@ const fs = require("fs");
 global.Promise = require("bluebird");
 mongoose.Promise = global.Promise;
 
-/**
- * @typedef {Object} Config
- * @property {string}         token             - The bot's token
- * @property {string}         prefix            - The bot's global prefix
- * @property {string|number}  embedColor        - Default embed color
- * @property {Object}         database          - Database settings
- * @property {string}         database.host
- * @property {number}         database.port
- * @property {string}         database.name
- */
-
-/**
- * @typedef {Object} Command
- * @property {Array<string>}  userPermissions   - Permissions required by the user who executed the command
- * @property {Array<string>}  botPermissions    - Permissions required by the bot to execute the command
- * @property {boolean}        guildOnly         - Whether the command can only be used in a guild or not
- * @property {string}         description       - The description of the command
- * @property {string}         usage             - The command usage
- * @property {Function}       run               - The functionality behind the command
- */
-
-/**
- * @typedef {Object<string, Command>} Commands  - An object with all the available commands
- */
-
  const Violation = new mongoose.Schema({
+     "id": String,
      "timestamp": String,
      "by": String,
      "reason": String
@@ -55,20 +31,18 @@ const GuildSchema = new mongoose.Schema({
 const Guild = mongoose.model("Guild", GuildSchema);
 
 const toml = fs.readFileSync(join(__dirname, "..", "config.toml"));
-/** @type {Config} */
 const config = TOML.parse(toml);
 config.embedColor = parseInt(config.embedColor, 16);
-let ready = false;
 
-/** @type {Commands} */
+let ready = false;
 let commands = {};
+
 const cmdDir = fs.readdirSync(join(__dirname, "commands"));
 for (let i = 0; i < cmdDir.length; i++) {
     const file = cmdDir[i];
     if (file.endsWith(".js")) {
-        const name = file.replace(".js", "");
-        const options = require(`./commands/${file}`);
-        commands[name] = options;
+        const command = new (require(`./commands/${file}`))();
+        commands[command.name] = command;
     }
 }
 
@@ -105,7 +79,13 @@ async function handleCommand(msg, dm) {
         }
     };
 
-    // TODO: Implement argument checks
+    if (commands[command].requiredArgs > args.length) {
+        try {
+            return await msg.channel.createMessage(`This command requires atleast ${commands[command].requiredArgs} arguments`);
+        } catch (e) {
+            return;
+        }
+    }
 
     // Only check for permission if the command is used in a guild
     if (msg.channel.guild) {

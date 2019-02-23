@@ -1,22 +1,22 @@
-const utils = require("../utils");
+const Command = require("../Command");
 
-module.exports = {
-    userPermissions: [
-        "sendMessages",
-        "banMembers"
-    ],
-    botPermissions: [
-        "readMessages",
-        "sendMessages",
-        "banMembers"
-    ],
-    guildOnly: true,
-    description: "Ban a user from the current guild",
-    usage: "ban <member: string|mention> [reason: string]",
-    run: async (msg, args, client, ctx) => {
+class Ban extends Command {
+    constructor() {
+        super({
+            name: "ban",
+            description: "Ban a user from the current guild",
+            usage: "ban <member: string|mention> [reason: string]",
+            guildOnly: true,
+            requiredArgs: 2,
+            userPermissions: ["sendMessages", "banMembers"],
+            botPermissions: ["readMessages", "sendMessages", "banMembers"]
+        });
+    }
+
+    async run(msg, args, client, ctx) {
         const userToBan = args.shift();
         const reason = args.join(" ");
-        const member = utils.findMember(msg, userToBan);
+        const member = this.findMember(msg, userToBan);
 
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
@@ -26,7 +26,7 @@ module.exports = {
             const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
-                const newBan = { timestamp: (new Date()).toISOString(), by: msg.author.id, reason: reason };
+                const newBan = { id: this.generateId(), timestamp: (new Date()).toISOString(), by: msg.author.id, reason: reason };
                 let banCount = 1;
                 if (user) {
                     user.isBanned = true;
@@ -64,9 +64,11 @@ module.exports = {
 
         try {
             const channel = await member.user.getDMChannel();
-            await channel.createMessage(`You have been banned from: **[${msg.channel.guild.name}]**\nBy: **[${msg.author.username}]**\nWith reason: **[${reason}]**`);
+            await channel.createMessage(`You have been banned from: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
         } catch (error) {
             await msg.channel.createMessage("Couldn't DM the banned member.");
         }
     }
-};
+}
+
+module.exports = Ban;

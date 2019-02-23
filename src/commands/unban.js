@@ -1,17 +1,19 @@
-module.exports = {
-    userPermissions: [
-        "sendMessages",
-        "banMembers"
-    ],
-    botPermissions: [
-        "readMessages",
-        "sendMessages",
-        "banMembers"
-    ],
-    guildOnly: true,
-    description: "Unban a user from the current guild",
-    usage: "unban <member: string> [reason: string]",
-    run: async (msg, args, client, ctx) => {
+const Command = require("../Command");
+
+class Unban extends Command {
+    constructor() {
+        super({
+            name: "unban",
+            description: "Unban a user from the current guild",
+            usage: "unban <member: string> [reason: string]",
+            guildOnly: true,
+            requiredArgs: 2,
+            userPermissions: ["sendMessages", "banMembers"],
+            botPermissions: ["readMessages", "sendMessages", "banMembers"]
+        });
+    }
+
+    async run(msg, args, client, ctx) {
         const userToUnban = args.shift();
         const reason = args.join(" ");
 
@@ -36,13 +38,13 @@ module.exports = {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "UNBAN",
-                            color: 0xffa216,
+                            color: 0x77bc00,
                             description: `**Unbanned:** ${entry.user.username}#${entry.user.discriminator}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
                                 `User has been banned ${banCount} ${banCount === 1 ? "time" : "times"}`,
                             timestamp: (new Date()).toISOString(),
-                            footer: { text: entry.user.id }
+                            footer: { text: `ID: ${entry.user.id}` }
                         }
                     });
                 }
@@ -60,9 +62,12 @@ module.exports = {
 
         try {
             const channel = await entry.user.getDMChannel();
-            await channel.createMessage(`You have been unbanned from: **[${msg.channel.guild.name}]**\nBy: **[${msg.author.username}]**\nWith reason: **[${reason}]**`);
+            await channel.createMessage(`You have been unbanned from: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
         } catch (error) {
             await msg.channel.createMessage("Couldn't DM the unbanned user.");
         }
     }
-};
+}
+
+
+module.exports = Unban;

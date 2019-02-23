@@ -1,20 +1,19 @@
-module.exports = {
-    userPermissions: [
-        "sendMessages",
-        "manageChannels"
-    ],
-    botPermissions: [
-        "readMessages",
-        "sendMessages"
-    ],
-    guildOnly: false,
-    description: "Testing the bot",
-    usage: "setlog <channel: string|mention>",
-    args: [
-        "required",
-        1
-    ],
-    run: async (msg, args, _client, { database }) => {
+const Command = require("../Command");
+
+class Setlog extends Command {
+    constructor() {
+        super({
+            name: "setlog",
+            description: "Set the log channel",
+            usage: "setlog <channel: string>",
+            guildOnly: true,
+            requiredArgs: 1,
+            userPermissions: ["sendMessages", "manageChannels"],
+            botPermissions: ["readMessages", "sendMessages"]
+        });
+    }
+
+    async run(msg, args, _client, { database }) {
         let channelId = "";
         if ((/^\d{17,18}/).test(args[0])) {
             channelId = args[0];
@@ -27,4 +26,6 @@ module.exports = {
         await database.guild.updateOne({ "id": msg.channel.guild.id }, { "logChannel": channelId });
         await msg.channel.createMessage(`Changed log channel to <#${channelId}>`);
     }
-};
+}
+
+module.exports = Setlog;

@@ -16,7 +16,7 @@ module.exports = {
             "never"
         ],
         "array-callback-return": "error",
-        "array-element-newline": "error",
+        "array-element-newline": "off",
         "arrow-body-style": "off",
         "arrow-parens": [
             "error",
@@ -111,7 +111,10 @@ module.exports = {
         "lines-around-directive": "error",
         "lines-between-class-members": "error",
         "max-classes-per-file": "error",
-        "max-depth": "error",
+        "max-depth": [
+            "error",
+            8
+        ],
         "max-len": "off",
         "max-lines": "error",
         "max-lines-per-function": "off",
