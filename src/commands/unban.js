@@ -11,7 +11,7 @@ module.exports = {
     guildOnly: true,
     description: "Unban a user from the current guild",
     usage: "unban <member: string> [reason: string]",
-    run: async (msg, args, _, ctx) => {
+    run: async (msg, args, client, ctx) => {
         const userToUnban = args.shift();
         const reason = args.join(" ");
 
@@ -22,10 +22,35 @@ module.exports = {
 
         try {
             await msg.channel.guild.unbanMember(entry.user.id, reason);
-            // TODO: Implement logging
-            // TODO: Implement database
+
+            const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            if (guild) {
+                const user = guild.users.find((o) => o.id === entry.user.id);
+                let banCount = 1;
+                if (user) {
+                    user.isBanned = false;
+                    banCount = user.bans.length;
+                }
+
+                if (guild.logChannel) {
+                    await client.createMessage(guild.logChannel, {
+                        embed: {
+                            title: "UNBAN",
+                            color: 0xffa216,
+                            description: `**Unbanned:** ${entry.user.username}#${entry.user.discriminator}\n` +
+                                `**By:** ${msg.author.mention}\n` +
+                                `**Reason:** ${reason}\n` +
+                                `User has been banned ${banCount} ${banCount === 1 ? "time" : "times"}`,
+                            timestamp: (new Date()).toISOString(),
+                            footer: { text: entry.user.id }
+                        }
+                    });
+                }
+
+                await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+            }
         } catch (error) {
-            await msg.channel.createMessage({
+            return await msg.channel.createMessage({
                 embed: {
                     color: ctx.config.embedColor,
                     description: error.toString()

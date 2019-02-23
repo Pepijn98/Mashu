@@ -3,28 +3,31 @@
 {
     "id": "",
     "logChannel": "",
-    "warned": [
+    "users": [
         {
-            "userId": "",
-            "count": 2,
-            "reasons": [
-                "reason 1",
-                "reason 2"
+            "id": "",
+            "isBanned": true,
+            "warns": [
+                {
+                    "timestamp": "",
+                    "by": "",
+                    "reason": ""
+                }
+            ],
+            "bans": [
+                {
+                    "timestamp": "",
+                    "by": "",
+                    "reason": "",
+                }
+            ],
+            "kicks": [
+                {
+                    "timestamp": "",
+                    "by": "",
+                    "reason": ""
+                }
             ]
-        }
-    ],
-    "banned": [ // Bans might not be needed since discord keeps track of that but it doesn't keep track of the times the user has been banned
-        {
-            "userId": "",
-            "reason": "",
-            "count": 0
-        }
-    ],
-    "kicked": [
-        {
-            "userId": "",
-            "reason": "",
-            "count": 0
         }
     ]
 }

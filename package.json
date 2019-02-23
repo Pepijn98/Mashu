@@ -26,6 +26,7 @@
     "dev": "cross-env NODE_ENV=development nodemon src/index.js --watch src"
   },
   "dependencies": {
+    "bluebird": "^3.5.3",
     "bufferutil": "^4.0.1",
     "cross-env": "^5.2.0",
     "eris": "abalabahaha/eris#dev",

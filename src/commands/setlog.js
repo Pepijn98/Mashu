@@ -16,7 +16,7 @@ module.exports = {
     ],
     run: async (msg, args, _client, { database }) => {
         let channelId = "";
-        if ((/^<#\d{17,18}>/).test(args[0])) {
+        if ((/^\d{17,18}/).test(args[0])) {
             channelId = args[0];
         } else {
             const channel = msg.channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(args[0].toLowerCase()) > -1);

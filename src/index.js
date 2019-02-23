@@ -4,6 +4,9 @@ const TOML = require("toml");
 const { join } = require("path");
 const fs = require("fs");
 
+global.Promise = require("bluebird");
+mongoose.Promise = global.Promise;
+
 /**
  * @typedef {Object} Config
  * @property {string}         token             - The bot's token
@@ -29,33 +32,27 @@ const fs = require("fs");
  * @typedef {Object<string, Command>} Commands  - An object with all the available commands
  */
 
- const warned = new mongoose.Schema({
-     "userId": String,
-     "count": Number,
-     "reasons": [String]
+ const Violation = new mongoose.Schema({
+     "timestamp": String,
+     "by": String,
+     "reason": String
  });
 
-const banned = new mongoose.Schema({
-    "userId": String,
-    "reason": String,
-    "count": Number
+const User = new mongoose.Schema({
+    "id": String,
+    "isBanned": Boolean,
+    "warns": [Violation],
+    "bans": [Violation],
+    "kicks": [Violation]
 });
 
-const kicked = new mongoose.Schema({
-    "userId": String,
-    "reason": String,
-    "count": Number
-});
-
-const guildSchema = new mongoose.Schema({
+const GuildSchema = new mongoose.Schema({
     "id": String,
     "logChannel": String,
-    "warned": [warned],
-    "banned": [banned],
-    "kicked": [kicked]
+    "users": [User]
 });
 
-const Guild = mongoose.model("Guild", guildSchema);
+const Guild = mongoose.model("Guild", GuildSchema);
 
 const toml = fs.readFileSync(join(__dirname, "..", "config.toml"));
 /** @type {Config} */
@@ -186,7 +183,6 @@ client.on("messageCreate", async (msg) => {
 });
 
 client.on("guildCreate", async (guild) => {
-    // TODO: Add guild to database
     const newGuild = new Guild({ "id": guild.id, "logChannel": "" });
     await newGuild.save();
 });
