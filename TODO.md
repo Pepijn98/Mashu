@@ -39,7 +39,7 @@
 
 ### 4. Change commands to classes
 
-### . Commands
+### 5. Commands
 - warn
 - baninfo
 - kickinfo
