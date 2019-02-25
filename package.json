@@ -23,7 +23,7 @@
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
     "start": "cross-env NODE_ENV=production yarn lint && node src/index.js",
-    "dev": "cross-env NODE_ENV=development nodemon src/index.js --watch src"
+    "dev": "cross-env NODE_ENV=development node src/index.js"
   },
   "dependencies": {
     "bluebird": "^3.5.3",
@@ -36,7 +36,6 @@
     "zlib-sync": "^0.1.4"
   },
   "devDependencies": {
-    "eslint": "^5.13.0",
-    "nodemon": "^1.18.9"
+    "eslint": "^5.13.0"
   }
 }

@@ -73,7 +73,8 @@ async function handleCommand(msg, dm) {
 
     const args = parts.splice(1);
     const context = {
-        config: config,
+        config,
+        commands,
         database: {
             guild: Guild
         }
@@ -124,6 +125,14 @@ async function handleCommand(msg, dm) {
                 return await msg.channel.createMessage(`You are missing these required permissions: ${missingPermissions.join(", ")}`);
             }
         }
+    }
+
+    if (commands[command].ownerOnly && msg.author.id !== config.owner) {
+        try {
+            await msg.channel.createMessage("Only the owner can execute this command.");
+        } catch (e) {} // eslint-disable-line no-empty
+
+        return;
     }
 
     try {

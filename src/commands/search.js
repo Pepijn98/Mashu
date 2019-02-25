@@ -20,6 +20,7 @@ class Search extends Command {
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
                 if (user) {
+                    let messages = [];
                     let message = "```md\n";
 
                     if (args[0] === "bans") {
@@ -27,43 +28,66 @@ class Search extends Command {
                             message = "This user has no ban violations.";
                         } else {
                             for (let i = 0; i < user.bans.length; i++) {
+                                if (message.length >= 1500) {
+                                    message += "```";
+                                    messages.push(message);
+                                    message = "```md\n";
+                                }
+
                                 let num = i + 1;
-                                message += `[${num}](${(new Date(user.bans[i].timestamp)).toLocaleString()})\n` +
-                                `ID:        ${user.bans[i].id}\n` +
-                                `Banned by: ${msg.channel.guild.members.get(user.bans[i].by).user.username}\n` +
-                                `Reason:    ${user.bans[i].reason}\n\n`;
+                                message += `[${num}](${(new Date(user.bans[i].timestamp)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })})\n` +
+                                    `ID:        ${user.bans[i].id}\n` +
+                                    `Banned by: ${msg.channel.guild.members.get(user.bans[i].by).user.username}\n` +
+                                    `Reason:    ${user.bans[i].reason}\n\n`;
                             }
                             message += "```";
                         }
+                        messages.push(message);
                     } else if (args[0] === "kicks") {
                         if (user.kicks.length === 0) {
                             message = "This user has no kick violations.";
                         } else {
                             for (let i = 0; i < user.kicks.length; i++) {
+                                if (message.length >= 1500) {
+                                    message += "```";
+                                    messages.push(message);
+                                    message = "```md\n";
+                                }
+
                                 let num = i + 1;
-                                message += `[${num}](${(new Date(user.kicks[i].timestamp)).toLocaleString()})\n` +
-                                `ID:        ${user.kicks[i].id}\n` +
-                                `Kicked by: ${msg.channel.guild.members.get(user.kicks[i].by).user.username}\n` +
-                                `Reason:    ${user.kicks[i].reason}\n\n`;
+                                message += `[${num}](${(new Date(user.kicks[i].timestamp)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })})\n` +
+                                    `ID:        ${user.kicks[i].id}\n` +
+                                    `Kicked by: ${msg.channel.guild.members.get(user.kicks[i].by).user.username}\n` +
+                                    `Reason:    ${user.kicks[i].reason}\n\n`;
                             }
                             message += "```";
                         }
+                        messages.push(message);
                     } else if (args[0] === "warns") {
                         if (user.warns.length === 0) {
                             message = "This user has no warn violations.";
                         } else {
                             for (let i = 0; i < user.warns.length; i++) {
+                                if (message.length >= 1500) {
+                                    message += "```";
+                                    messages.push(message);
+                                    message = "```md\n";
+                                }
+
                                 let num = i + 1;
-                                message += `[${num}](${(new Date(user.warns[i].timestamp)).toLocaleString()})\n` +
+                                message += `[${num}](${(new Date(user.warns[i].timestamp)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })})\n` +
                                     `ID:        ${user.warns[i].id}\n` +
                                     `Warned by: ${msg.channel.guild.members.get(user.warns[i].by).user.username}\n` +
                                     `Reason:    ${user.warns[i].reason}\n\n`;
                             }
                             message += "```";
                         }
+                        messages.push(message);
                     }
 
-                    await msg.channel.createMessage(message);
+                    for (let i = 0; i < messages.length; i++) {
+                        await msg.channel.createMessage(messages[i]);
+                    }
                 } else {
                     return await msg.channel.createMessage("Couldn't find this user in the database.");
                 }

@@ -56,7 +56,10 @@ module.exports = {
             "error",
             "last"
         ],
-        "complexity": "error",
+        "complexity": [
+            "error",
+            50
+        ],
         "computed-property-spacing": [
             "error",
             "never"
@@ -151,7 +154,7 @@ module.exports = {
         "no-else-return": "off",
         "no-empty-function": "off",
         "no-eq-null": "error",
-        "no-eval": "error",
+        "no-eval": "off",
         "no-extend-native": "error",
         "no-extra-bind": "error",
         "no-extra-label": "error",
