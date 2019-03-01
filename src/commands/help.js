@@ -5,18 +5,17 @@ class Help extends Command {
         super({
             name: "help",
             description: "send info about the commands",
-            usage: "help",
-            userPermissions: ["sendMessages"],
-            botPermissions: ["readMessages", "sendMessages"]
+            usage: "help"
         });
     }
 
     async run(msg, args, client, ctx) {
         if (args.length === 0) {
             let messageQueue = [];
-            let currentMessage = `\n# Here's a list of my commands. For more info do: ${ctx.config.prefix}help <command>`;
+            let currentMessage = `\n# Here's a list of my commands. For more info do: ${ctx.config.prefix}help <command>\n# Prefix: ${ctx.config.prefix}\n`;
             ctx.commands.forEach((command) => {
-                if (command.hidden === true) return;
+                if (command.hidden === true) return; // Command is hidden
+                if (command.ownerOnly && msg.author.id !== ctx.config.owner) return; // Command can only be viewed by the owner
 
                 let toAdd = `@${command.name}\n` +
                     `   "${command.description}"\n`;
@@ -37,21 +36,26 @@ class Help extends Command {
                 }
             }, 300);
         } else {
-            let cmd = this.checkForMatch(args[0], ctx);
-            if (cmd === null) {
+            const command = this.checkForMatch(args[0], ctx);
+            if (command.hidden === true) return; // Command is hidden
+            if (command.ownerOnly && msg.author.id !== ctx.config.owner) {
+                return await msg.channel.createMessage("This command can only be viewed and used by the owner.");
+            }
+
+            if (command === null) {
                 await msg.channel.createMessage(`Command \`${ctx.config.prefix}${args[0]}\` not found`);
             } else {
                 const helpMessage = "```asciidoc\n" +
-                    `= ${cmd.name} =\n` +
-                    `${cmd.description}\n` +
+                    `= ${command.name} =\n` +
+                    `${command.description}\n` +
                     "----------\n\n" +
-                    `Aliases            ::  ${cmd.aliases.join(", ")}\n` +
-                    `Usage              ::  ${ctx.config.prefix}${cmd.usage}\n` +
-                    `Guild Only         ::  ${cmd.guildOnly ? "yes" : "no"}\n` +
-                    `Owner Only         ::  ${cmd.ownerOnly ? "yes" : "no"}\n` +
-                    `Required Args      ::  ${cmd.requiredArgs}\n` +
-                    `User Permissions   ::  ${cmd.userPermissions.join(", ")}\n` +
-                    `Bot Permissions    ::  ${cmd.botPermissions.join(", ")}\n\n` +
+                    `Aliases            ::  ${command.aliases.join(", ")}\n` +
+                    `Usage              ::  ${ctx.config.prefix}${command.usage}\n` +
+                    `Guild Only         ::  ${command.guildOnly ? "yes" : "no"}\n` +
+                    `Owner Only         ::  ${command.ownerOnly ? "yes" : "no"}\n` +
+                    `Required Args      ::  ${command.requiredArgs}\n` +
+                    `User Permissions   ::  ${command.userPermissions.join(", ")}\n` +
+                    `Bot Permissions    ::  ${command.botPermissions.join(", ")}\n\n` +
                     "<> = required\n" +
                     "[] = optional\n" +
                     "```";

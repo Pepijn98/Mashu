@@ -9,7 +9,7 @@ class Warn extends Command {
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "kickMembers"],
-            botPermissions: ["readMessages", "sendMessages", "kickMembers"]
+            botPermissions: ["readMessages", "sendMessages"]
         });
     }
 

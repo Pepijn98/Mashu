@@ -7,8 +7,7 @@ class Eval extends Command {
             description: "Evaluate javascript code",
             usage: "eval <code: string>",
             ownerOnly: true,
-            userPermissions: ["sendMessages"],
-            botPermissions: ["readMessages", "sendMessages"]
+            requiredArgs: 1
         });
     }
 
@@ -17,9 +16,6 @@ class Eval extends Command {
 
         let toEval = msg.content.replace(`${ctx.config.prefix}eval`, "").trim();
         let result = "~eval failed~";
-
-        console.log(toEval);
-
         try {
             result = eval(toEval);
             result = result.replace(new RegExp(`${ctx.config.token}`, "giu"), "<token-redacted>");
