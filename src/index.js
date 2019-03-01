@@ -64,16 +64,6 @@ async function handleCommand(msg, dm) {
     const command = commands.find((cmd) => cmd.name === name || cmd.aliases.indexOf(name) !== -1);
     if (!command) return; // Command doesn't exist
 
-    // Let the user know the command can only be run in a guild
-    if (command.guildOnly && dm) {
-        try {
-            await msg.channel.createMessage(`The command \`${command}\` can only be run in a guild.`);
-        } catch (error) {
-            console.error(error);
-        }
-        return;
-    }
-
     const args = parts.splice(1);
     const context = {
         config,
@@ -83,12 +73,31 @@ async function handleCommand(msg, dm) {
         }
     };
 
+    // Let the user know the command can only be run in a guild
+    if (command.guildOnly && dm) {
+        try {
+            await msg.channel.createMessage(`The command \`${command}\` can only be run in a guild.`);
+        } catch (e) {} // eslint-disable-line no-empty
+
+        return;
+    }
+
+    // Check command args count
     if (command.requiredArgs > args.length) {
         try {
-            return await msg.channel.createMessage(`This command requires atleast ${command.requiredArgs} arguments`);
-        } catch (e) {
-            return;
-        }
+            await msg.channel.createMessage(`This command requires atleast ${command.requiredArgs} arguments`);
+        } catch (e) {} // eslint-disable-line no-empty
+
+        return;
+    }
+
+    // Check if command is owner only
+    if (command.ownerOnly && msg.author.id !== config.owner) {
+        try {
+            await msg.channel.createMessage("Only the owner can execute this command.");
+        } catch (e) {} // eslint-disable-line no-empty
+
+        return;
     }
 
     // Only check for permission if the command is used in a guild
@@ -128,14 +137,6 @@ async function handleCommand(msg, dm) {
                 return await msg.channel.createMessage(`You are missing these required permissions: ${missingPermissions.join(", ")}`);
             }
         }
-    }
-
-    if (command.ownerOnly && msg.author.id !== config.owner) {
-        try {
-            await msg.channel.createMessage("Only the owner can execute this command.");
-        } catch (e) {} // eslint-disable-line no-empty
-
-        return;
     }
 
     try {
