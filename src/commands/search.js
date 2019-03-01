@@ -6,6 +6,7 @@ class Search extends Command {
             name: "search",
             description: "Search for a user entry in the database",
             usage: "search <bans|kicks|warns> <member: string|mention>",
+            aliases: ["find"],
             guildOnly: true,
             requiredArgs: 2
         });

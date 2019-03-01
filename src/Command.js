@@ -6,6 +6,7 @@ class Command {
      * @param {string} options.name
      * @param {string} options.description
      * @param {string} options.usage
+     * @param {Array<string>} [options.aliases=[]]
      * @param {boolean} [options.guildOnly=false]
      * @param {boolean} [options.ownerOnly=false]
      * @param {number} [options.requiredArgs=0]
@@ -13,9 +14,12 @@ class Command {
      * @param {Array<string>} [options.botPermissions=["readMessages", "sendMessages"]]
      */
     constructor(options) {
+        this.id = options.name; // Collection id
+
         this.name = options.name;
         this.description = options.description;
         this.usage = options.usage;
+        this.aliases = options.aliases || [];
         this.guildOnly = options.guildOnly || false;
         this.ownerOnly = options.ownerOnly || false;
         this.requiredArgs = options.requiredArgs || 0;

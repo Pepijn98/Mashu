@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const TOML = require("toml");
 const { join } = require("path");
 const fs = require("fs");
+const Command = require("./Command");
 
 global.Promise = require("bluebird");
 mongoose.Promise = global.Promise;
@@ -35,14 +36,15 @@ const config = TOML.parse(toml);
 config.embedColor = parseInt(config.embedColor, 16);
 
 let ready = false;
-let commands = {};
+let commands = new Eris.Collection(Command);
 
 const cmdDir = fs.readdirSync(join(__dirname, "commands"));
 for (let i = 0; i < cmdDir.length; i++) {
     const file = cmdDir[i];
     if (file.endsWith(".js")) {
         const command = new (require(`./commands/${file}`))();
-        commands[command.name] = command;
+        // commands[command.name] = command;
+        commands.add(command);
     }
 }
 
@@ -57,12 +59,13 @@ const client = new Eris.Client(config.token, {
  */
 async function handleCommand(msg, dm) {
     const parts = msg.content.split(" ");
-    const command = parts[0].slice(config.prefix.length);
+    const name = parts[0].slice(config.prefix.length);
 
-    if (!commands[command]) return; // Command doesn't exist
+    const command = commands.find((cmd) => cmd.name === name || cmd.aliases.indexOf(name) !== -1);
+    if (!command) return; // Command doesn't exist
 
     // Let the user know the command can only be run in a guild
-    if (commands[command].guildOnly && dm) {
+    if (command.guildOnly && dm) {
         try {
             await msg.channel.createMessage(`The command \`${command}\` can only be run in a guild.`);
         } catch (error) {
@@ -80,9 +83,9 @@ async function handleCommand(msg, dm) {
         }
     };
 
-    if (commands[command].requiredArgs > args.length) {
+    if (command.requiredArgs > args.length) {
         try {
-            return await msg.channel.createMessage(`This command requires atleast ${commands[command].requiredArgs} arguments`);
+            return await msg.channel.createMessage(`This command requires atleast ${command.requiredArgs} arguments`);
         } catch (e) {
             return;
         }
@@ -90,7 +93,7 @@ async function handleCommand(msg, dm) {
 
     // Only check for permission if the command is used in a guild
     if (msg.channel.guild) {
-        const botPermissions = commands[command].botPermissions;
+        const botPermissions = command.botPermissions;
         if (botPermissions.length > 0) {
             const member = msg.channel.guild.members.get(client.user.id);
             let missingPermissions = [];
@@ -110,7 +113,7 @@ async function handleCommand(msg, dm) {
             }
         }
 
-        const userPermissions = commands[command].userPermissions;
+        const userPermissions = command.userPermissions;
         if (userPermissions.length > 0) {
             const member = msg.channel.guild.members.get(msg.author.id);
             let missingPermissions = [];
@@ -127,7 +130,7 @@ async function handleCommand(msg, dm) {
         }
     }
 
-    if (commands[command].ownerOnly && msg.author.id !== config.owner) {
+    if (command.ownerOnly && msg.author.id !== config.owner) {
         try {
             await msg.channel.createMessage("Only the owner can execute this command.");
         } catch (e) {} // eslint-disable-line no-empty
@@ -136,7 +139,7 @@ async function handleCommand(msg, dm) {
     }
 
     try {
-        await commands[command].run(msg, args, client, context);
+        await command.run(msg, args, client, context);
     } catch (error) {
         try {
             await msg.channel.createMessage({
