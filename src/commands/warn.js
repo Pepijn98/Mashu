@@ -13,7 +13,7 @@ class Warn extends Command {
         });
     }
 
-    async run(msg, args, client, ctx) {
+    async run(msg, args, client, { config, database }) {
         const userToWarn = args.shift();
         const member = this.findMember(msg, userToWarn);
 
@@ -21,7 +21,7 @@ class Warn extends Command {
 
         const reason = args.join(" ");
         try {
-            const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
                 const newWarn = { id: this.generateId(), timestamp: (new Date()).toISOString(), by: msg.author.id, reason: reason };
@@ -37,7 +37,7 @@ class Warn extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "WARN",
-                            color: ctx.config.colors.warn,
+                            color: config.colors.warn,
                             description: `**Warned:** ${member.user.mention}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -48,12 +48,12 @@ class Warn extends Command {
                     });
                 }
 
-                await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+                await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
             }
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.colors.error,
+                    color: config.colors.error,
                     description: error.toString()
                 }
             });

@@ -13,7 +13,7 @@ class Unban extends Command {
         });
     }
 
-    async run(msg, args, client, ctx) {
+    async run(msg, args, client, { config, database }) {
         const userToUnban = args.shift();
         const reason = args.join(" ");
 
@@ -25,7 +25,7 @@ class Unban extends Command {
         try {
             await msg.channel.guild.unbanMember(entry.user.id, reason);
 
-            const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === entry.user.id);
                 let banCount = 1;
@@ -38,7 +38,7 @@ class Unban extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "UNBAN",
-                            color: ctx.config.colors.unban,
+                            color: config.colors.unban,
                             description: `**Unbanned:** ${entry.user.username}#${entry.user.discriminator}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -49,12 +49,12 @@ class Unban extends Command {
                     });
                 }
 
-                await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+                await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
             }
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.colors.error,
+                    color: config.colors.error,
                     description: error.toString()
                 }
             });

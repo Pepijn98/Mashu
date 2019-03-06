@@ -13,14 +13,14 @@ class Remove extends Command {
         });
     }
 
-    async run(msg, args, _client, ctx) {
+    async run(msg, args, _client, { config, database }) {
         const type = args.shift();
         const id = args.shift();
         const member = this.findMember(msg, args.join(" "));
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
         try {
-            const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
 
@@ -38,13 +38,13 @@ class Remove extends Command {
                     }
                 }
 
-                await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+                await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
                 await msg.channel.createMessage(message);
             }
         } catch (error) {
             await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.colors.error,
+                    color: config.colors.error,
                     description: error.toString()
                 }
             });

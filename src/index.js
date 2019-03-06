@@ -18,6 +18,7 @@ mongoose.Promise = global.Promise;
 const User = new mongoose.Schema({
     "id": String,
     "isBanned": Boolean,
+    "isMuted": Boolean,
     "warns": [Violation],
     "bans": [Violation],
     "kicks": [Violation]
@@ -26,6 +27,7 @@ const User = new mongoose.Schema({
 const GuildSchema = new mongoose.Schema({
     "id": String,
     "logChannel": String,
+    "muteRole": String,
     "users": [User]
 });
 
@@ -42,7 +44,6 @@ for (let i = 0; i < cmdDir.length; i++) {
     const file = cmdDir[i];
     if (file.endsWith(".js")) {
         const command = new (require(`./commands/${file}`))();
-        // commands[command.name] = command;
         commands.add(command);
     }
 }
@@ -62,7 +63,7 @@ async function handleCommand(msg, dm) {
     const name = parts[0].slice(config.prefix.length);
 
     const command = commands.find((cmd) => cmd.name === name || cmd.aliases.indexOf(name) !== -1);
-    if (!command) return; // Command doesn't exist
+    if (!command) return false; // Command doesn't exist
 
     const args = parts.splice(1);
     const context = {
@@ -77,27 +78,24 @@ async function handleCommand(msg, dm) {
     if (command.guildOnly && dm) {
         try {
             await msg.channel.createMessage(`The command \`${command}\` can only be run in a guild.`);
-        } catch (e) {} // eslint-disable-line no-empty
-
-        return;
+        } catch (e) {}
+        return false;
     }
 
     // Check command args count
     if (command.requiredArgs > args.length) {
         try {
             await msg.channel.createMessage(`This command requires atleast ${command.requiredArgs} arguments`);
-        } catch (e) {} // eslint-disable-line no-empty
-
-        return;
+        } catch (e) {}
+        return false;
     }
 
     // Check if command is owner only
     if (command.ownerOnly && msg.author.id !== config.owner) {
         try {
             await msg.channel.createMessage("Only the owner can execute this command.");
-        } catch (e) {} // eslint-disable-line no-empty
-
-        return;
+        } catch (e) {}
+        return false;
     }
 
     // Only check for permission if the command is used in a guild
@@ -115,10 +113,9 @@ async function handleCommand(msg, dm) {
 
             if (missingPermissions.length > 0) {
                 try {
-                    return await msg.channel.createMessage(`The bot is missing these required permissions: ${missingPermissions.join(", ")}`);
-                } catch (e) {
-                    return;
-                }
+                    await msg.channel.createMessage(`The bot is missing these required permissions: ${missingPermissions.join(", ")}`);
+                } catch (e) {}
+                return false;
             }
         }
 
@@ -134,13 +131,15 @@ async function handleCommand(msg, dm) {
             }
 
             if (missingPermissions.length > 0) {
-                return await msg.channel.createMessage(`You are missing these required permissions: ${missingPermissions.join(", ")}`);
+                await msg.channel.createMessage(`You are missing these required permissions: ${missingPermissions.join(", ")}`);
+                return false;
             }
         }
     }
 
     try {
         await command.run(msg, args, client, context);
+        return true;
     } catch (error) {
         try {
             await msg.channel.createMessage({
@@ -149,9 +148,8 @@ async function handleCommand(msg, dm) {
                     description: error.toString()
                 }
             });
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) {}
+        return false;
     }
 }
 

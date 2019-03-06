@@ -12,12 +12,12 @@ class Search extends Command {
         });
     }
 
-    async run(msg, args, _client, ctx) {
+    async run(msg, args, _client, { config, database }) {
         const member = this.findMember(msg, args[1]);
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
         try {
-            const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
                 if (user) {
@@ -96,7 +96,7 @@ class Search extends Command {
         } catch (e) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.colors.error,
+                    color: config.colors.error,
                     description: e.toString()
                 }
             });

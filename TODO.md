@@ -12,7 +12,7 @@ const Violation = {
 const User = {
     "id": String,
     "isBanned": Boolean,
-    "isMuted": Boolean, // Add when implementing mute
+    "isMuted": Boolean,
     "warns": Array<Violation>,
     "bans": Array<Violation>,
     "kicks": Array<Violation>
@@ -21,7 +21,7 @@ const User = {
 const Guild = {
     "id": String,
     "logChannel": String,
-    "muteRole": String, // Add when implementing mute
+    "muteRole": String,
     "users": Array<User>
 }
 ```
@@ -53,3 +53,5 @@ const Guild = {
 #### Keep users muted when the try to bypass the role
 1. On `guildMemberAdd` check if user exists in database and see if `isMuted` is true
 2. If user exists and `isMuted` is true re-add the muted role
+
+### 8. Change setlog to an interactive setup command

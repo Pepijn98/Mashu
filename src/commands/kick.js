@@ -13,7 +13,7 @@ class Kick extends Command {
         });
     }
 
-    async run(msg, args, client, ctx) {
+    async run(msg, args, client, { config, database }) {
         const userToKick = args.shift();
         const reason = args.join(" ");
         const member = this.findMember(msg, userToKick);
@@ -23,7 +23,7 @@ class Kick extends Command {
         try {
             await member.kick(reason);
 
-            const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
                 const newKick = { id: this.generateId(), timestamp: (new Date()).toISOString(), by: msg.author.id, reason: reason };
@@ -39,7 +39,7 @@ class Kick extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "KICK",
-                            color: ctx.config.colors.kick,
+                            color: config.colors.kick,
                             description: `**Kicked:** ${member.user.mention}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -50,12 +50,12 @@ class Kick extends Command {
                     });
                 }
 
-                await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+                await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
             }
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.colors.error,
+                    color: config.colors.error,
                     description: error.toString()
                 }
             });
