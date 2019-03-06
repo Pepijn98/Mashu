@@ -39,7 +39,7 @@ class Kick extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "KICK",
-                            color: 0xf43900,
+                            color: ctx.config.colors.kick,
                             description: `**Kicked:** ${member.user.mention}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -55,7 +55,7 @@ class Kick extends Command {
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.embedColor,
+                    color: ctx.config.colors.error,
                     description: error.toString()
                 }
             });

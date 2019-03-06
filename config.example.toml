@@ -1,8 +1,15 @@
 token = ""
 owner = ""
 prefix = "c/"
-embedColor = "0xDC143C"
 
+# Colors are decimal numbers
+# Convert hex to decimal with https://www.rapidtables.com/convert/number/hex-to-decimal.html
+[colors]
+error = 14423100
+ban = 13697065
+unban = 7846912
+warn = 15198757
+kick = 16005376
 
 [database]
 host = "localhost"

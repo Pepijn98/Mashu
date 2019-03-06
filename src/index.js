@@ -33,7 +33,6 @@ const Guild = mongoose.model("Guild", GuildSchema);
 
 const toml = fs.readFileSync(join(__dirname, "..", "config.toml"));
 const config = TOML.parse(toml);
-config.embedColor = parseInt(config.embedColor, 16);
 
 let ready = false;
 let commands = new Eris.Collection(Command);

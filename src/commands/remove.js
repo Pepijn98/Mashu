@@ -44,7 +44,7 @@ class Remove extends Command {
         } catch (error) {
             await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.embedColor,
+                    color: ctx.config.colors.error,
                     description: error.toString()
                 }
             });

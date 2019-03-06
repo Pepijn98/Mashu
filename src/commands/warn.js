@@ -37,7 +37,7 @@ class Warn extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "WARN",
-                            color: 0xe7ea25,
+                            color: ctx.config.colors.warn,
                             description: `**Warned:** ${member.user.mention}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -53,7 +53,7 @@ class Warn extends Command {
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.embedColor,
+                    color: ctx.config.colors.error,
                     description: error.toString()
                 }
             });

@@ -96,7 +96,7 @@ class Search extends Command {
         } catch (e) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.embedColor,
+                    color: ctx.config.colors.error,
                     description: e.toString()
                 }
             });

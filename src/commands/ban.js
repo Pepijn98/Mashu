@@ -40,7 +40,7 @@ class Ban extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "BAN",
-                            color: ctx.config.embedColor,
+                            color: ctx.config.colors.ban,
                             description: `**Banned:** ${member.user.mention}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -56,7 +56,7 @@ class Ban extends Command {
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.embedColor,
+                    color: ctx.config.colors.error,
                     description: error.toString()
                 }
             });

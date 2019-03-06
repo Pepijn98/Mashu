@@ -38,7 +38,7 @@ class Unban extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "UNBAN",
-                            color: 0x77bc00,
+                            color: ctx.config.colors.unban,
                             description: `**Unbanned:** ${entry.user.username}#${entry.user.discriminator}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -54,7 +54,7 @@ class Unban extends Command {
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: ctx.config.embedColor,
+                    color: ctx.config.colors.error,
                     description: error.toString()
                 }
             });
