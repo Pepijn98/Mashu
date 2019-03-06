@@ -49,7 +49,8 @@ for (let i = 0; i < cmdDir.length; i++) {
 }
 
 const client = new Eris.Client(config.token, {
-    getAllUsers: true
+    getAllUsers: true,
+    restMode: true
 });
 
  /**
