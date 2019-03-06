@@ -4,8 +4,10 @@ class Ping extends Command {
     constructor() {
         super({
             name: "setup",
-            description: "Testing await messages",
-            usage: "setup"
+            description: "Setup some basic moderation info",
+            usage: "setup [--skip <logchannel|muterole>]",
+            guildOnly: true,
+            userPermissions: ["manageGuild"]
         });
     }
 
