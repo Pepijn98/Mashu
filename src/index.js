@@ -5,6 +5,8 @@ const { join } = require("path");
 const fs = require("fs");
 const Command = require("./Command");
 
+require("./utils/awaitMessages")(Eris);
+
 global.Promise = require("bluebird");
 mongoose.Promise = global.Promise;
 
