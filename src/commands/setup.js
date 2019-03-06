@@ -7,7 +7,7 @@ class Ping extends Command {
             description: "Setup some basic moderation info",
             usage: "setup [--skip <logchannel|muterole>]",
             guildOnly: true,
-            userPermissions: ["manageGuild"]
+            userPermissions: ["sendMessages", "manageGuild"]
         });
     }
 
