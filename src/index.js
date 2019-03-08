@@ -192,7 +192,7 @@ client.on("guildCreate", async (guild) => {
 client.on("channelCreate", async (channel) => {
     if (channel.type === 0) {
         const guild = await Guild.findOne({ "id": channel.guild.id }).exec();
-        if (guild.muteRole) {
+        if (guild && guild.muteRole) {
             await channel.editPermission(guild.muteRole, 0, 55360, "role", "Create muted overrides");
         }
     }
