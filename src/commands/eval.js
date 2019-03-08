@@ -18,7 +18,7 @@ class Eval extends Command {
         let result = "~eval failed~";
         try {
             result = await eval(toEval);
-            result = result ? result.replace(new RegExp(`${ctx.config.token}`, "giu"), "<token-redacted>") : "Empty Result";
+            result = result ? result.toString().replace(new RegExp(`${ctx.config.token}`, "giu"), "<token-redacted>") : "Empty Result";
         } catch (error) {
             console.debug(`[EVAL FAILED] ${error.message}`);
             msg.channel.createMessage(`\`\`\`diff\n- ${error}\`\`\``);
