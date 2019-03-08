@@ -4,12 +4,16 @@ prefix = "c/"
 
 # Colors are decimal numbers
 # Convert hex to decimal with https://www.rapidtables.com/convert/number/hex-to-decimal.html
+# or decimal to hex https://www.rapidtables.com/convert/number/decimal-to-hex.html
 [colors]
+default = 15785696
 error = 14423100
 ban = 13697065
 unban = 7846912
-warn = 15198757
+warn = 15379236
 kick = 16005376
+mute = 15391780
+unmute = 7846912
 
 [database]
 host = "localhost"

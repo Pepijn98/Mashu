@@ -8,7 +8,7 @@ class Mute extends Command {
             usage: "unmute <member: string|mention> [reason: string]",
             guildOnly: true,
             requiredArgs: 2,
-            userPermissions: ["sendMessages", "kickMembers"],
+            userPermissions: ["sendMessages", "manageRoles"],
             botPermissions: ["readMessages", "sendMessages", "manageRoles"]
         });
     }

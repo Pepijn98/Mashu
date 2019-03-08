@@ -11,12 +11,19 @@ require("./utils/awaitMessages")(Eris);
 global.Promise = require("bluebird");
 mongoose.Promise = global.Promise;
 
- const Violation = new mongoose.Schema({
-     "id": String,
-     "timestamp": String,
-     "by": String,
-     "reason": String
- });
+const Violation = new mongoose.Schema({
+    "id": String,
+    "timestamp": String,
+    "by": String,
+    "reason": String
+});
+
+const Note = new mongoose.Schema({
+    "id": String,
+    "timestamp": String,
+    "by": String,
+    "message": String
+});
 
 const User = new mongoose.Schema({
     "id": String,
@@ -24,7 +31,8 @@ const User = new mongoose.Schema({
     "isMuted": Boolean,
     "warns": [Violation],
     "bans": [Violation],
-    "kicks": [Violation]
+    "kicks": [Violation],
+    "notes": [Note]
 });
 
 const GuildSchema = new mongoose.Schema({
