@@ -5,6 +5,7 @@ const { join } = require("path");
 const fs = require("fs");
 const Command = require("./Command");
 
+// Add functions to Eris' prototype
 require("./utils/awaitMessages")(Eris);
 
 global.Promise = require("bluebird");
@@ -180,6 +181,15 @@ client.on("guildCreate", async (guild) => {
     await newGuild.save();
 });
 
+client.on("channelCreate", async (channel) => {
+    if (channel.type === 0) {
+        const guild = await Guild.findOne({ "id": channel.guild.id }).exec();
+        if (guild.muteRole) {
+            await channel.editPermission(guild.muteRole, 0, 55360, "role", "Create muted overrides");
+        }
+    }
+});
+
 client.on("guildMemberAdd", async (guild, member) => {
     const dbGuild = await Guild.findOne({ "id": guild.id }).exec();
     if (dbGuild && dbGuild.muteRole) {
@@ -200,7 +210,7 @@ client.on("guildMemberAdd", async (guild, member) => {
                 });
             }
 
-            member.addRole(dbGuild.muteRole, `[MUTED] ${reason}`);
+            await member.addRole(dbGuild.muteRole, `[MUTED] ${reason}`);
         }
     }
 });

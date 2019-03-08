@@ -42,7 +42,7 @@ class Mute extends Command {
                 });
             }
 
-            member.addRole(guild.muteRole, `[MUTED] ${reason}`);
+            await member.addRole(guild.muteRole, `[MUTED] ${reason}`);
             await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
         }
     }

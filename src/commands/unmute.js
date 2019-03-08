@@ -42,7 +42,7 @@ class Mute extends Command {
                 });
             }
 
-            member.removeRole(guild.muteRole, reason);
+            await member.removeRole(guild.muteRole, reason);
             await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
         }
     }
