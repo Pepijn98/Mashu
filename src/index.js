@@ -180,4 +180,29 @@ client.on("guildCreate", async (guild) => {
     await newGuild.save();
 });
 
+client.on("guildMemberAdd", async (guild, member) => {
+    const dbGuild = await Guild.findOne({ "id": guild.id }).exec();
+    if (dbGuild && dbGuild.muteRole) {
+        const user = dbGuild.users.find((u) => u.id === member.user.id);
+        if (user && user.isMuted) {
+            const reason = "Member left while being muted, re-added muted role until a moderator unmutes the member";
+            if (dbGuild.logChannel) {
+                await client.createMessage(dbGuild.logChannel, {
+                    embed: {
+                        title: "MUTE",
+                        color: config.colors.mute,
+                        description: `**Muted:** ${member.user.mention}\n` +
+                            `**By:** ${client.user.mention}\n` +
+                            `**Reason:** ${reason}`,
+                        timestamp: (new Date()).toISOString(),
+                        footer: { text: `ID: ${member.user.id}` }
+                    }
+                });
+            }
+
+            member.addRole(dbGuild.muteRole, `[MUTED] ${reason}`);
+        }
+    }
+});
+
 client.connect().catch(console.error);
