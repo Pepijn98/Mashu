@@ -1,4 +1,4 @@
-const Command = require("../Command");
+const Command = require("../../Command");
 
 class Remove extends Command {
     constructor() {
@@ -6,6 +6,7 @@ class Remove extends Command {
             name: "remove",
             description: "Remove a violation from a user",
             usage: "remove <warning|ban|kick> <id: string> <member: string|mention>",
+            category: "moderation",
             guildOnly: true,
             requiredArgs: 3,
             userPermissions: ["sendMessages", "administrator"],
@@ -13,7 +14,7 @@ class Remove extends Command {
         });
     }
 
-    async run(msg, args, _client, { config, database }) {
+    async run(msg, args, _client, { settings, database }) {
         const type = args.shift();
         const id = args.shift();
         const member = this.findMember(msg, args.join(" "));
@@ -44,7 +45,7 @@ class Remove extends Command {
         } catch (error) {
             await msg.channel.createMessage({
                 embed: {
-                    color: config.colors.error,
+                    color: settings.colors.error,
                     description: error.toString()
                 }
             });

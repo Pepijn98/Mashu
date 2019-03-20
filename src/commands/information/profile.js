@@ -1,4 +1,4 @@
-const Command = require("../Command");
+const Command = require("../../Command");
 
 class Profile extends Command {
     constructor() {
@@ -6,11 +6,12 @@ class Profile extends Command {
             name: "profile",
             description: "View your or someone else's profile",
             usage: "profile [member: string|mention]",
+            category: "information",
             guildOnly: true
         });
     }
 
-    async run(msg, args, _client, { config, database }) {
+    async run(msg, args, _client, { settings, database }) {
         const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
         if (!guild) return await msg.channel.createMessage("Couldn't find current guild in the database, make sure you've ran the setup command.");
         const userToFind = args.length ? args.join(" ") : msg.author.id;
@@ -26,7 +27,7 @@ class Profile extends Command {
         await msg.channel.createMessage({
             embed: {
                 title: `Viewing profile of ${member.nick ? member.nick : member.username}`,
-                color: config.colors.default,
+                color: settings.colors.default,
                 timestamp: (new Date()).toISOString(),
                 thumbnail: {
                     url: member.user.dynamicAvatarURL("png", 512)

@@ -1,6 +1,6 @@
 {
   "name": "chloe",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Attempt to create a moderation bot",
   "author": {
     "email": "root@kurozeropb.info",
@@ -22,8 +22,8 @@
   "scripts": {
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
-    "start": "cross-env NODE_ENV=production yarn lint && node src/index.js",
-    "dev": "cross-env NODE_ENV=development node src/index.js"
+    "start": "cross-env NODE_ENV=production yarn lint && node --no-warnings src/index.js",
+    "dev": "cross-env NODE_ENV=development node --no-warnings src/index.js"
   },
   "dependencies": {
     "bluebird": "^3.5.3",
@@ -32,7 +32,6 @@
     "eris": "abalabahaha/eris#dev",
     "erlpack": "abalabahaha/erlpack",
     "mongoose": "^5.4.14",
-    "toml": "^3.0.0",
     "zlib-sync": "^0.1.4"
   },
   "devDependencies": {

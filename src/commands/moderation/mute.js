@@ -1,11 +1,12 @@
-const Command = require("../Command");
+const Command = require("../../Command");
 
 class Mute extends Command {
     constructor() {
         super({
-            name: "unmute",
-            description: "Unmute a user in the current guild",
-            usage: "unmute <member: string|mention> [reason: string]",
+            name: "mute",
+            description: "Mute a user in the current guild",
+            usage: "mute <member: string|mention> [reason: string]",
+            category: "moderation",
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "manageRoles"],
@@ -13,27 +14,27 @@ class Mute extends Command {
         });
     }
 
-    async run(msg, args, client, { config, database }) {
+    async run(msg, args, client, { settings, database }) {
         const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
         if (guild && guild.muteRole) {
-            const userToUnmute = args.shift();
+            const userToMute = args.shift();
             const reason = args.join(" ");
-            const member = this.findMember(msg, userToUnmute);
-            if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${userToUnmute}**`);
+            const member = this.findMember(msg, userToMute);
+            if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${userToMute}**`);
 
             const user = guild.users.find((u) => u.id === member.user.id);
             if (user) {
-                user.isMuted = false;
+                user.isMuted = true;
             } else {
-                guild.users.push({ id: member.user.id, isMuted: false, isBanned: false });
+                guild.users.push({ id: member.user.id, isMuted: true, isBanned: false });
             }
 
             if (guild.logChannel) {
                 await client.createMessage(guild.logChannel, {
                     embed: {
-                        title: "UNMUTE",
-                        color: config.colors.unmute,
-                        description: `**Unmuted:** ${member.user.mention}\n` +
+                        title: "MUTE",
+                        color: settings.colors.mute,
+                        description: `**Muted:** ${member.user.mention}\n` +
                             `**By:** ${msg.author.mention}\n` +
                             `**Reason:** ${reason}`,
                         timestamp: (new Date()).toISOString(),
@@ -42,7 +43,7 @@ class Mute extends Command {
                 });
             }
 
-            await member.removeRole(guild.muteRole, reason);
+            await member.addRole(guild.muteRole, `[MUTED] ${reason}`);
             await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
         }
     }

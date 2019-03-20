@@ -61,4 +61,4 @@ typings/
 .next
 
 # bot configs
-config.toml
+settings.js

@@ -19,6 +19,7 @@ class Command {
         this.name = options.name;
         this.description = options.description;
         this.usage = options.usage;
+        this.category = options.category || "general";
         this.aliases = options.aliases || [];
         this.guildOnly = options.guildOnly || false;
         this.ownerOnly = options.ownerOnly || false;
@@ -49,28 +50,6 @@ class Command {
         }
 
         return false;
-    }
-
-    /**
-     * Format an date
-     *
-     * @param {string} isoString
-     * @returns {string} Formatted string will look like dd-mm-yyyy
-     */
-    formatDate(isoString) {
-        const date = new Date(isoString);
-        const year = date.getFullYear();
-        let month = date.getMonth() + 1;
-        let dt = date.getDate();
-
-        if (dt < 10) {
-            dt = `0${dt}`;
-        }
-        if (month < 10) {
-            month = `0${month}`;
-        }
-
-        return `${dt}-${month}-${year}`;
     }
 
     generateId() {

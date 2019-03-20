@@ -1,4 +1,4 @@
-const Command = require("../Command");
+const Command = require("../../Command");
 
 class Unban extends Command {
     constructor() {
@@ -6,6 +6,7 @@ class Unban extends Command {
             name: "unban",
             description: "Unban a user from the current guild",
             usage: "unban <member: string> [reason: string]",
+            category: "moderation",
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "banMembers"],
@@ -13,7 +14,7 @@ class Unban extends Command {
         });
     }
 
-    async run(msg, args, client, { config, database }) {
+    async run(msg, args, client, { settings, database }) {
         const userToUnban = args.shift();
         const reason = args.join(" ");
 
@@ -38,7 +39,7 @@ class Unban extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "UNBAN",
-                            color: config.colors.unban,
+                            color: settings.colors.unban,
                             description: `**Unbanned:** ${entry.user.username}#${entry.user.discriminator}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -54,7 +55,7 @@ class Unban extends Command {
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: config.colors.error,
+                    color: settings.colors.error,
                     description: error.toString()
                 }
             });

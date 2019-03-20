@@ -1,4 +1,4 @@
-const Command = require("../Command");
+const Command = require("../../Command");
 
 class Ban extends Command {
     constructor() {
@@ -6,6 +6,7 @@ class Ban extends Command {
             name: "ban",
             description: "Ban a user from the current guild",
             usage: "ban <member: string|mention> [reason: string]",
+            category: "moderation",
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "banMembers"],
@@ -13,7 +14,7 @@ class Ban extends Command {
         });
     }
 
-    async run(msg, args, client, { config, database }) {
+    async run(msg, args, client, { settings, database }) {
         const userToBan = args.shift();
         const reason = args.join(" ");
         const member = this.findMember(msg, userToBan);
@@ -40,7 +41,7 @@ class Ban extends Command {
                     await client.createMessage(guild.logChannel, {
                         embed: {
                             title: "BAN",
-                            color: config.colors.ban,
+                            color: settings.colors.ban,
                             description: `**Banned:** ${member.user.mention}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
@@ -56,7 +57,7 @@ class Ban extends Command {
         } catch (error) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: config.colors.error,
+                    color: settings.colors.error,
                     description: error.toString()
                 }
             });

@@ -1,4 +1,4 @@
-const Command = require("../Command");
+const Command = require("../../Command");
 
 class Search extends Command {
     constructor() {
@@ -6,13 +6,14 @@ class Search extends Command {
             name: "search",
             description: "Search for a user entry in the database",
             usage: "search <bans|kicks|warns> <member: string|mention>",
+            category: "information",
             aliases: ["find"],
             guildOnly: true,
             requiredArgs: 2
         });
     }
 
-    async run(msg, args, _client, { config, database }) {
+    async run(msg, args, _client, { settings, database }) {
         const member = this.findMember(msg, args[1]);
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
@@ -96,7 +97,7 @@ class Search extends Command {
         } catch (e) {
             return await msg.channel.createMessage({
                 embed: {
-                    color: config.colors.error,
+                    color: settings.colors.error,
                     description: e.toString()
                 }
             });
