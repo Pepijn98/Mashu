@@ -36,6 +36,10 @@ class MessageCollector extends EventEmitter {
     }
 }
 
+String.prototype.upperCaseFirst = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
 module.exports = (Eris) => {
     Eris.Channel.prototype.awaitMessages = function (filter, options) {
         const collector = new MessageCollector(this, filter, options);

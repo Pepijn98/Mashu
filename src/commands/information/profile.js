@@ -24,6 +24,17 @@ class Profile extends Command {
             await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
         }
 
+        let note = "```diff\n";
+        if (user.notes.length === 0) {
+            note += "No notes found for this user";
+        } else {
+            const notes = Array.from(user.notes);
+            notes.sort((a, b) => (a.timestamp < b.timestamp) ? 1 : ((a.timestamp > b.timestamp) ? -1 : 0));
+            note += `${notes[0].message}\n`;
+            note += `${notes[1].message}`;
+        }
+        note += "```";
+
         await msg.channel.createMessage({
             embed: {
                 title: `Viewing profile of ${member.nick ? member.nick : member.username}`,
@@ -34,11 +45,7 @@ class Profile extends Command {
                 },
                 description: `Username: ${member.username}#${member.discriminator}\n` +
                     `Joined At: ${(new Date(member.joinedAt)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })}\n\n` +
-                    "Most recent notes:\n" +
-                    "```diff\n" +
-                    "+ Not yet implemented\n" +
-                    `- ${member.nick ? member.nick : member.username} has been a bad boii\n` +
-                    "```",
+                    `Most recent notes:\n${note}`,
                 fields: [
                     { name: "Warns", value: user.warns.length, inline: true },
                     { name: "Kicks", value: user.kicks.length, inline: true },

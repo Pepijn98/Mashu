@@ -34,7 +34,7 @@ class CommandHandler {
         // Check command args count
         if (command.requiredArgs > args.length) {
             try {
-                await msg.channel.createMessage(`This command requires atleast ${command.requiredArgs} arguments`);
+                await msg.channel.createMessage(`Invalid argument count, check \`${this.settings.prefix}help ${command.name}\` to see how this command works.`);
             } catch (e) {}
             return false;
         }
