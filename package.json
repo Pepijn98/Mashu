@@ -23,15 +23,18 @@
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
     "start": "cross-env NODE_ENV=production yarn lint && node --no-warnings src/index.js",
-    "dev": "cross-env NODE_ENV=development node --no-warnings src/index.js"
+    "dev": "cross-env NODE_ENV=development node src/index.js"
   },
   "dependencies": {
     "bluebird": "^3.5.3",
     "bufferutil": "^4.0.1",
+    "chalk": "^2.4.2",
     "cross-env": "^5.2.0",
     "eris": "abalabahaha/eris#dev",
     "erlpack": "abalabahaha/erlpack",
+    "moment": "^2.24.0",
     "mongoose": "^5.4.14",
+    "winston": "^3.2.1",
     "zlib-sync": "^0.1.4"
   },
   "devDependencies": {

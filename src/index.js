@@ -3,10 +3,11 @@ const mongoose = require("mongoose");
 const settings = require("../settings");
 const CommandHandler = require("./utils/CommandHandler");
 const CommandLoader = require("./utils/CommandLoader");
-const GuildModel = require("./utils/Schemas");
+const GuildModel = require("./utils/Mongoose");
+const Logger = require("./utils/Logger");
 
 // Add functions to Eris' prototype
-require("./utils/awaitMessages")(Eris);
+require("./utils/Extended")(Eris);
 
 global.Promise = require("bluebird");
 mongoose.Promise = global.Promise;
@@ -17,15 +18,21 @@ const client = new Eris.Client(settings.token, {
     restMode: true
 });
 
+const logger = new Logger();
 const commandLoader = new CommandLoader();
-const commandHandler = new CommandHandler(settings, client);
+const commandHandler = new CommandHandler({ settings, client, logger });
 
 client.on("ready", async () => {
-    console.log("Loading commands...");
-    client.commands = await commandLoader.load(`${__dirname}/commands`);
-    console.log(`Finished loading [${client.commands.size}] commands`);
-    await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
-    console.log(`Ready! Logged in as ${client.user.username}`);
+    if (!ready) {
+        client.commands = await commandLoader.load(`${__dirname}/commands`);
+        await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
+
+        logger.ready(`Logged in as ${client.user.tag}`);
+        logger.ready(`Loaded [${client.commands.size}] commands`);
+    } else {
+        logger.ready("Reconnected");
+    }
+
     ready = true;
 });
 
@@ -87,4 +94,4 @@ process.on("SIGINT", () => {
     process.exit(0);
 });
 
-client.connect().catch(console.error);
+client.connect().catch((e) => logger.error("CONNECT", e.stack));

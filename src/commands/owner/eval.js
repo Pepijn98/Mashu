@@ -13,7 +13,7 @@ class Eval extends Command {
     }
 
     async run(msg, args, client, ctx) {
-        console.debug(`[EVAL] ${msg.author.username}: ${msg.content}`);
+        ctx.logger.info("EVAL", `${msg.author.username}: ${msg.content}`);
 
         let toEval = msg.content.replace(`${ctx.settings.prefix}eval`, "").trim();
         let result = "~eval failed~";
@@ -21,12 +21,12 @@ class Eval extends Command {
             result = await eval(toEval);
             result = result ? result.toString().replace(new RegExp(`${ctx.settings.token}`, "giu"), "<token-redacted>") : "Empty Result";
         } catch (error) {
-            console.debug(`[EVAL FAILED] ${error.message}`);
+            ctx.logger.info("EVAL FAILED", `${error.toString()}`);
             msg.channel.createMessage(`\`\`\`diff\n- ${error}\`\`\``);
         }
 
         if (result !== "~eval failed~") {
-            console.debug(`[EVAL RESULT] ${result}`);
+            ctx.logger.info("EVAL RESULT", `${result}`);
             msg.channel.createMessage(`__**Result:**__ \n${result}`);
         }
     }

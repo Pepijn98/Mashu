@@ -3,8 +3,9 @@ const Command = require("../Command");
 const { Collection } = require("eris");
 
 class CommandLoader {
-    constructor() {
+    constructor(logger) {
         this.commands = new Collection(Command);
+        this.logger = logger;
     }
 
     /**
@@ -35,12 +36,12 @@ class CommandLoader {
 
             const command = new (require(commandPath))();
             if (this.commands.has(command.name)) {
-                console.warn(`A command with the name ${command.name} already exists and has been skipped`);
+                this.logger.warn("CommandHandler", `A command with the name ${command.name} already exists and has been skipped`);
             } else {
                 this.commands.add(command);
             }
         } catch (e) {
-            console.warn(`${commandPath} - ${e.stack}`);
+            this.logger.warn("CommandHandler", `${commandPath} - ${e.stack}`);
         }
     }
 }

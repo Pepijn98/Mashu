@@ -1,9 +1,10 @@
-const GuildModel = require("./Schemas");
+const GuildModel = require("./Mongoose");
 
 class CommandHandler {
-    constructor(settings, client) {
-        this.settings = settings;
-        this.client = client;
+    constructor(options) {
+        this.settings = options.settings;
+        this.client = options.client;
+        this.logger = options.logger;
     }
 
     async handleCommand(msg, dm) {
@@ -16,6 +17,7 @@ class CommandHandler {
         const args = parts.splice(1);
         const context = {
             settings: this.settings,
+            logger: this.logger,
             database: {
                 guild: GuildModel
             }

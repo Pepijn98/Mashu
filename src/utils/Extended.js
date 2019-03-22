@@ -41,4 +41,16 @@ module.exports = (Eris) => {
         const collector = new MessageCollector(this, filter, options);
         return new Promise((resolve) => collector.on("end", resolve));
     };
+
+    Reflect.defineProperty(Eris.User.prototype, "tag", {
+        get: function() {
+            return `${this.username}#${this.discriminator}`;
+        }
+    });
+
+    Reflect.defineProperty(Eris.Member.prototype, "tag", {
+        get: function() {
+            return `${this.username}#${this.discriminator}`;
+        }
+    });
 };
