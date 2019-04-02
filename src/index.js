@@ -1,6 +1,7 @@
 const Eris = require("eris");
 const mongoose = require("mongoose");
 const settings = require("../settings");
+const Chloe = require("./utils/ChloeClient");
 const CommandHandler = require("./utils/CommandHandler");
 const CommandLoader = require("./utils/CommandLoader");
 const GuildModel = require("./utils/Mongoose");
@@ -13,7 +14,7 @@ global.Promise = require("bluebird");
 mongoose.Promise = global.Promise;
 let ready = false;
 
-const client = new Eris.Client(settings.token, {
+const client = new Chloe(settings.token, {
     getAllUsers: true,
     restMode: true
 });

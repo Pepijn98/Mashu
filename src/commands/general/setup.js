@@ -16,17 +16,17 @@ class Ping extends Command {
             args.shift();
             const remainder = args.join(" ");
             switch (remainder) {
-                case "logchannel":
-                    const resp1 = await this.createMuteRole(msg, database);
-                    if (resp1 === false) await msg.channel.createMessage("Successfully exited setup.");
-                    break;
-                case "muterole":
-                    const resp2 = await this.askLogChannel(msg, database);
-                    if (resp2 === false) await msg.channel.createMessage("Successfully exited setup.");
-                    break;
-                default:
-                    await msg.channel.createMessage(`Option ${remainder} isn't skippable or isn't an option at all.`);
-                    break;
+            case "logchannel":
+                const resp1 = await this.createMuteRole(msg, database);
+                if (resp1 === false) await msg.channel.createMessage("Successfully exited setup.");
+                break;
+            case "muterole":
+                const resp2 = await this.askLogChannel(msg, database);
+                if (resp2 === false) await msg.channel.createMessage("Successfully exited setup.");
+                break;
+            default:
+                await msg.channel.createMessage(`Option ${remainder} isn't skippable or isn't an option at all.`);
+                break;
             }
         } else {
             const resp1 = await this.askLogChannel(msg, database);

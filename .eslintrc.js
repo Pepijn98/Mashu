@@ -93,7 +93,10 @@ module.exports = {
             "error",
             "beside"
         ],
-        "indent": "off",
+        "indent": [
+            "error",
+            4
+        ],
         "indent-legacy": "off",
         "init-declarations": "error",
         "jsx-quotes": "error",
@@ -148,7 +151,7 @@ module.exports = {
         "no-case-declarations": "off",
         "no-catch-shadow": "error",
         "no-confusing-arrow": "off",
-        "no-console": "error",
+        "no-console": "off",
         "no-continue": "off",
         "no-div-regex": "error",
         "no-duplicate-imports": "error",
