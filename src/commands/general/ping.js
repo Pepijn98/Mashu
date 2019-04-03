@@ -1,11 +1,12 @@
 const Command = require("../../Command");
 
 class Ping extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "ping",
             description: "Testing the bot",
-            usage: "ping"
+            usage: "ping",
+            category: category
         });
     }
 

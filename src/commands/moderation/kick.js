@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Kick extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "kick",
             description: "Kick a user from the current guild",
             usage: "kick <member: string|mention> [reason: string]",
-            category: "moderation",
+            category: category,
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "kickMembers"],

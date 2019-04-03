@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Ban extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "ban",
             description: "Ban a user from the current guild",
             usage: "ban <member: string|mention> [reason: string]",
-            category: "moderation",
+            category: category,
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "banMembers"],

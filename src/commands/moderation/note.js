@@ -1,7 +1,7 @@
 const Command = require("../../Command");
 
 class Note extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "note",
             description: "Add, remove, update or view notes for a user in the current guild =\n" +
@@ -9,7 +9,7 @@ class Note extends Command {
                 "= Add + or - in front of a message to mark it either positive or negative =\n" +
                 "= All available actions are add, remove, update and view",
             usage: "note <action: string> <member: string|mention> <message: string>",
-            category: "moderation",
+            category: category,
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "manageRoles"],

@@ -1,11 +1,12 @@
 const Command = require("../../Command");
 
 class Ping extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "setup",
             description: "Setup some basic moderation info",
             usage: "setup [--skip <logchannel|muterole>]",
+            category: category,
             guildOnly: true,
             userPermissions: ["sendMessages", "manageGuild"]
         });

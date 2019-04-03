@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Help extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "help",
             description: "send info about the commands",
             usage: "help",
-            category: "information"
+            category: category
         });
     }
 

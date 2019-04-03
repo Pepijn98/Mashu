@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Mute extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "unmute",
             description: "Unmute a user in the current guild",
             usage: "unmute <member: string|mention> [reason: string]",
-            category: "moderation",
+            category: category,
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "manageRoles"],

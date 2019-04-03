@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Remove extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "remove",
             description: "Remove a violation from a user",
             usage: "remove <warning|ban|kick> <id: string> <member: string|mention>",
-            category: "moderation",
+            category: category,
             guildOnly: true,
             requiredArgs: 3,
             userPermissions: ["sendMessages", "administrator"],

@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Eval extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "eval",
             description: "Evaluate javascript code",
             usage: "eval <code: string>",
-            category: "owner",
+            category: category,
             ownerOnly: true,
             requiredArgs: 1
         });

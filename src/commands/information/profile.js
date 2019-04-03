@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Profile extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "profile",
             description: "View your or someone else's profile",
             usage: "profile [member: string|mention]",
-            category: "information",
+            category: category,
             guildOnly: true
         });
     }

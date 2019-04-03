@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Warn extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "warn",
             description: "Warn a user from the current guild",
             usage: "warn <member: string|mention> [reason: string]",
-            category: "moderation",
+            category: category,
             guildOnly: true,
             requiredArgs: 2,
             userPermissions: ["sendMessages", "kickMembers"],

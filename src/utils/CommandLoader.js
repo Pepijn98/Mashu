@@ -22,7 +22,7 @@ class CommandLoader {
 
             for (const file of files) {
                 if (file.endsWith(".js")) {
-                    this.add(`${commandDir}/${dir}/${file}`);
+                    this._add(`${commandDir}/${dir}/${file}`, dir);
                 }
             }
         }
@@ -30,11 +30,12 @@ class CommandLoader {
         return this.commands;
     }
 
-    add(commandPath) {
+    /** @hidden */
+    _add(commandPath, category) {
         try {
             Reflect.deleteProperty(require.cache, require.resolve(commandPath));
 
-            const command = new (require(commandPath))();
+            const command = new (require(commandPath))(category);
             if (this.commands.has(command.name)) {
                 this.logger.warn("CommandHandler", `A command with the name ${command.name} already exists and has been skipped`);
             } else {

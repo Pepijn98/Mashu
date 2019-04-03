@@ -1,12 +1,12 @@
 const Command = require("../../Command");
 
 class Search extends Command {
-    constructor() {
+    constructor(category) {
         super({
             name: "search",
             description: "Search for a user entry in the database",
             usage: "search <bans|kicks|warns> <member: string|mention>",
-            category: "information",
+            category: category,
             aliases: ["find"],
             guildOnly: true,
             requiredArgs: 2
