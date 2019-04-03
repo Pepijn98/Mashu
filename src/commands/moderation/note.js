@@ -12,8 +12,8 @@ class Note extends Command {
             category: category,
             guildOnly: true,
             requiredArgs: 2,
-            userPermissions: ["sendMessages", "manageRoles"],
-            botPermissions: ["readMessages", "sendMessages", "manageRoles"]
+            userPermissions: ["sendMessages", "manageGuild"],
+            botPermissions: ["readMessages", "sendMessages"]
         });
     }
 
