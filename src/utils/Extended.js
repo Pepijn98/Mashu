@@ -1,7 +1,5 @@
 const EventEmitter = require("events").EventEmitter;
 
-const Eris = require("eris");
-
 class MessageCollector extends EventEmitter {
     constructor(channel, filter, options = {}) {
         super();
@@ -42,7 +40,7 @@ String.prototype.upperCaseFirst = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
-module.exports = () => {
+module.exports = (Eris) => {
     Eris.Channel.prototype.awaitMessages = function (filter, options) {
         const collector = new MessageCollector(this, filter, options);
         return new Promise((resolve) => collector.on("end", resolve));
