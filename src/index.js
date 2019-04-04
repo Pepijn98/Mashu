@@ -1,7 +1,7 @@
 const Eris = require("eris");
 const mongoose = require("mongoose");
 const settings = require("../settings");
-const Chloe = require("./utils/ChloeClient");
+const Mashu = require("./utils/MashuClient");
 const CommandHandler = require("./utils/CommandHandler");
 const CommandLoader = require("./utils/CommandLoader");
 const GuildModel = require("./utils/Mongoose");
@@ -14,13 +14,13 @@ global.Promise = require("bluebird");
 mongoose.Promise = global.Promise;
 let ready = false;
 
-const client = new Chloe(settings.token, {
+const client = new Mashu(settings.token, {
     getAllUsers: true,
     restMode: true
 });
 
 const logger = new Logger();
-const commandLoader = new CommandLoader();
+const commandLoader = new CommandLoader(logger);
 const commandHandler = new CommandHandler({ settings, client, logger });
 
 client.on("ready", async () => {

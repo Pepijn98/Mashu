@@ -25,6 +25,10 @@ class Ping extends Command {
                     const resp2 = await this.askLogChannel(msg, database);
                     if (resp2 === false) await msg.channel.createMessage("Successfully exited setup.");
                     break;
+                case "suggestion":
+                    const resp3 = await this.askSuggestionChannel(msg, database);
+                    if (resp3 === false) await msg.channel.createMessage("Successfully exited setup.");
+                    break;
                 default:
                     await msg.channel.createMessage(`Option ${remainder} isn't skippable or isn't an option at all.`);
                     break;
@@ -34,6 +38,8 @@ class Ping extends Command {
             if (resp1 === false) return await msg.channel.createMessage("Successfully exited setup.");
             const resp2 = await this.createMuteRole(msg, database);
             if (resp2 === false) await msg.channel.createMessage("Successfully exited setup.");
+            const resp3 = await this.askSuggestionChannel(msg, database);
+            if (resp3 === false) await msg.channel.createMessage("Successfully exited setup.");
         }
     }
 
@@ -59,6 +65,34 @@ class Ping extends Command {
             }
 
             await database.guild.updateOne({ "id": msg.channel.guild.id }, { "logChannel": channelId });
+            await msg.channel.createMessage(`Changed log channel to <#${channelId}>`);
+        } else {
+            await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);
+        }
+    }
+
+    async askSuggestionChannel(msg, database) {
+        await msg.channel.createMessage(`${msg.author.mention}, What will be the suggestions channel?\nPlease reply with either the channel name, id or mention the channel.\nType \`exit\` to stop.`);
+
+        let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
+        if (responses.length) {
+            const content = responses[0]
+                ? responses[0].content.toLowerCase()
+                : null;
+
+            if (content === null) return await msg.channel.createMessage("Error getting a response");
+            if (content === "exit") return false;
+
+            let channelId = "";
+            if ((/^\d{17,18}/).test(content)) {
+                channelId = content;
+            } else {
+                const channel = msg.channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(content) > -1);
+                channelId = channel.id;
+                if (!channel) return await msg.channel.createMessage("Couldn't find a channel with that name.");
+            }
+
+            await database.guild.updateOne({ "id": msg.channel.guild.id }, { "suggestionChannel": channelId });
             await msg.channel.createMessage(`Changed log channel to <#${channelId}>`);
         } else {
             await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);

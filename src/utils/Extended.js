@@ -36,8 +36,12 @@ class MessageCollector extends EventEmitter {
     }
 }
 
-String.prototype.upperCaseFirst = function () {
+String.prototype.upperCaseFirst = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+Array.prototype.paginate = function(pageSize, pageNumber) {
+    return this.slice((pageNumber - 1) * pageSize, pageSize);
 };
 
 module.exports = (Eris) => {

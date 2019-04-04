@@ -24,11 +24,27 @@ const User = new mongoose.Schema({
     "notes": [Note]
 });
 
+const SuggestionSchema = new mongoose.Schema({
+    "id": Number,
+    "creator": String,
+    "creatorId": String,
+    "moderator": String,
+    "modId": String,
+    "state": {
+        "default": "created",
+        "type": String
+    },
+    "content": String,
+    "notificationId": String
+});
+
 const GuildSchema = new mongoose.Schema({
     "id": String,
     "logChannel": String,
+    "suggestionChannel": String,
     "muteRole": String,
-    "users": [User]
+    "users": [User],
+    "suggestions": [SuggestionSchema]
 });
 
 const GuildModel = mongoose.model("Guild", GuildSchema);

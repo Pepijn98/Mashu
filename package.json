@@ -1,5 +1,5 @@
 {
-  "name": "chloe",
+  "name": "mashu",
   "version": "0.0.2",
   "description": "Attempt to create a moderation bot",
   "author": {
@@ -10,14 +10,14 @@
   "main": "src/index.js",
   "license": "MIT",
   "keywords": [],
-  "homepage": "https://kurozeropb.info",
+  "homepage": "https://github.com/KurozeroPB/Mashu#readme",
   "bugs": {
     "email": "root@kurozeropb.info",
-    "url": "https://github.com/KurozeroPB/chloe/issues"
+    "url": "https://github.com/KurozeroPB/Mashu/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KurozeroPB/chloe.git"
+    "url": "https://github.com/KurozeroPB/Mashu.git"
   },
   "scripts": {
     "lint": "eslint --ext .js --ignore-path .gitignore .",

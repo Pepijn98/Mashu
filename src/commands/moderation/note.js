@@ -5,7 +5,7 @@ class Note extends Command {
         super({
             name: "note",
             description: "Add, remove, update or view notes for a user in the current guild =\n" +
-                "= when removing or viewing notes the message is not needed =\n" +
+                "= when removing, viewing or updating notes the message is not needed =\n" +
                 "= Add + or - in front of a message to mark it either positive or negative =\n" +
                 "= All available actions are add, remove, update and view",
             usage: "note <action: string> <member: string|mention> <message: string>",
@@ -113,6 +113,7 @@ class Note extends Command {
                     type: "last"
                 }
             ]);
+            await msg.channel.createMessage("Please reply with the id of the note you want to delete.");
             const responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 30000, maxMatches: 1 });
             if (responses.length) {
                 const content = responses[0]
@@ -186,6 +187,7 @@ class Note extends Command {
                     type: "last"
                 }
             ]);
+            await msg.channel.createMessage("Please reply with the id of the note you want to update and a new message for the note.");
             const responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 30000, maxMatches: 1 });
             if (responses.length) {
                 let content = responses[0]

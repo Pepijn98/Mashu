@@ -23,17 +23,6 @@ class CommandHandler {
             }
         };
 
-        // if (command.reactionButtons) {
-        //     command.reactionButtons.forEach((button) => msg.addReaction(button.emoji));
-        //     this.client.activeMessages[msg.id] = {
-        //         args: args,
-        //         command: command,
-        //         timeout: setTimeout(() => {
-        //             this.client.unwatchMessage(msg.id, msg.channel.id);
-        //         }, command.reactionButtonTimeout)
-        //     };
-        // }
-
         // Let the user know the command can only be run in a guild
         if (command.guildOnly && dm) {
             try {

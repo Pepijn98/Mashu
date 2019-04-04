@@ -49,6 +49,7 @@ class Help extends Command {
                 const helpMessage = "```asciidoc\n" +
                     `[${command.name.upperCaseFirst()}]\n\n` +
                     `= ${command.description} =\n\n` +
+                    `Category           ::  ${command.category}\n` +
                     `Aliases            ::  ${command.aliases.join(", ")}\n` +
                     `Usage              ::  ${ctx.settings.prefix}${command.usage}\n` +
                     `Guild Only         ::  ${command.guildOnly ? "yes" : "no"}\n` +

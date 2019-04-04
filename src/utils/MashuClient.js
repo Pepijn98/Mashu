@@ -1,6 +1,6 @@
 const { Client } = require("eris");
 
-class Chloe extends Client {
+class Mashu extends Client {
     constructor(token, options) {
         super(token, options);
 
@@ -29,7 +29,6 @@ class Chloe extends Client {
                 case "next":
                     activeMessage.queueIndex++;
                     if (activeMessage.queueIndex > activeMessage.messageQueue.length - 1) activeMessage.queueIndex--;
-                    console.log(activeMessage.queueIndex);
                     await activeMessage.self.edit(activeMessage.messageQueue[activeMessage.queueIndex]);
                     break;
                 case "previous":
@@ -76,4 +75,4 @@ class Chloe extends Client {
     }
 }
 
-module.exports = Chloe;
+module.exports = Mashu;
