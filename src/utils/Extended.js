@@ -41,11 +41,12 @@ String.prototype.upperCaseFirst = function() {
 };
 
 Array.prototype.paginate = function(pageSize, pageNumber) {
-    return this.slice((pageNumber - 1) * pageSize, pageSize);
+    --pageNumber;
+    return this.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
 };
 
 module.exports = (Eris) => {
-    Eris.Channel.prototype.awaitMessages = function (filter, options) {
+    Eris.Channel.prototype.awaitMessages = function(filter, options) {
         const collector = new MessageCollector(this, filter, options);
         return new Promise((resolve) => collector.on("end", resolve));
     };

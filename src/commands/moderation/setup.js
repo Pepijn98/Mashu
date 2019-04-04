@@ -1,50 +1,40 @@
 const Command = require("../../Command");
+const { sleep } = require("../../utils/Helpers");
 
-class Ping extends Command {
+class Setup extends Command {
     constructor(category) {
         super({
             name: "setup",
             description: "Setup some basic moderation info",
-            usage: "setup [--skip <logchannel|muterole>]",
+            usage: "setup",
             category: category,
             guildOnly: true,
             userPermissions: ["sendMessages", "manageGuild"]
         });
     }
 
-    async run(msg, args, _client, { database }) {
-        if (args.length >= 2 && (args[0] === "--skip" || args[0] === "-s")) {
-            args.shift();
-            const remainder = args.join(" ");
-            switch (remainder) {
-                case "logchannel":
-                    const resp1 = await this.createMuteRole(msg, database);
-                    if (resp1 === false) await msg.channel.createMessage("Successfully exited setup.");
-                    break;
-                case "muterole":
-                    const resp2 = await this.askLogChannel(msg, database);
-                    if (resp2 === false) await msg.channel.createMessage("Successfully exited setup.");
-                    break;
-                case "suggestion":
-                    const resp3 = await this.askSuggestionChannel(msg, database);
-                    if (resp3 === false) await msg.channel.createMessage("Successfully exited setup.");
-                    break;
-                default:
-                    await msg.channel.createMessage(`Option ${remainder} isn't skippable or isn't an option at all.`);
-                    break;
-            }
-        } else {
-            const resp1 = await this.askLogChannel(msg, database);
-            if (resp1 === false) return await msg.channel.createMessage("Successfully exited setup.");
-            const resp2 = await this.createMuteRole(msg, database);
-            if (resp2 === false) await msg.channel.createMessage("Successfully exited setup.");
-            const resp3 = await this.askSuggestionChannel(msg, database);
-            if (resp3 === false) await msg.channel.createMessage("Successfully exited setup.");
-        }
+    async run(msg, _args, _client, { database }) {
+        await msg.channel.createMessage(`Hello ${msg.author.mention}, I'm gonna ask you a series of questions starting in 5 seconds.\nPlease reply within 15 seconds for each question.\nType \`exit\` at anytime to stop.`);
+        await sleep(5000);
+
+        const logChannel = await this.askLogChannel(msg, database);
+        if (logChannel === false) return await msg.channel.createMessage("Successfully exited setup.");
+
+        const suggestionChannel = await this.askSuggestionChannel(msg, database);
+        if (suggestionChannel === false) return await msg.channel.createMessage("Successfully exited setup.");
+
+        const notifyCreator = await this.askNotifyCreator(msg, database);
+        if (notifyCreator === false) return await msg.channel.createMessage("Successfully exited setup.");
+
+        const muteRole = await this.createMuteRole(msg, database);
+        if (muteRole === false) return await msg.channel.createMessage("Successfully exited setup.");
+
+        await sleep(1000);
+        await msg.channel.createMessage(`${msg.author.mention}, That was the last question. Setup successfully completed!`);
     }
 
     async askLogChannel(msg, database) {
-        await msg.channel.createMessage(`${msg.author.mention}, What will be the log channel?\nPlease reply with either the channel name, id or mention the channel.\nType \`exit\` to stop.`);
+        await msg.channel.createMessage(`${msg.author.mention}, What will be the log channel?\nPlease reply with either the channel name, id or mention the channel.`);
 
         let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
         if (responses.length) {
@@ -72,7 +62,7 @@ class Ping extends Command {
     }
 
     async askSuggestionChannel(msg, database) {
-        await msg.channel.createMessage(`${msg.author.mention}, What will be the suggestions channel?\nPlease reply with either the channel name, id or mention the channel.\nType \`exit\` to stop.`);
+        await msg.channel.createMessage(`${msg.author.mention}, What will be the suggestions channel?\nPlease reply with either the channel name, id or mention the channel.`);
 
         let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
         if (responses.length) {
@@ -99,8 +89,30 @@ class Ping extends Command {
         }
     }
 
+    async askNotifyCreator(msg, database) {
+        await msg.channel.createMessage(`${msg.author.mention}, Do you want to notify the creator of a suggestion when it gets accepted or denied?\nPlease reply with either (y)es or (n)o.`);
+
+        let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
+        if (responses.length) {
+            const content = responses[0]
+                ? responses[0].content.toLowerCase()
+                : "";
+
+            if (!content) return await msg.channel.createMessage("Error getting a response");
+            if (content === "exit") return false;
+
+            const update = content.toLowerCase().startsWith("y") ? true : content.toLowerCase().startsWith("n") ? false : null;
+            if (!update) return await msg.channel.createMessage("Invalid reply, reply with either yes or no.");
+
+            await database.guild.updateOne({ "id": msg.channel.guild.id }, { "notifyCreator": update });
+            await msg.channel.createMessage(update ? "Okay! I will notify the creator whenever their suggestion gets updated." : "Okay! I won't notify the suggestion creators.");
+        } else {
+            await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);
+        }
+    }
+
     async createMuteRole(msg, database) {
-        await msg.channel.createMessage(`${msg.author.mention}, Do you want to create a new muted role?\nPlease reply with either (y)es or (n)o.\nType \`exit\` to stop.`);
+        await msg.channel.createMessage(`${msg.author.mention}, Do you want to create a new muted role?\nPlease reply with either (y)es or (n)o.`);
 
         let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
         if (responses.length) {
@@ -144,4 +156,4 @@ class Ping extends Command {
     }
 }
 
-module.exports = Ping;
+module.exports = Setup;

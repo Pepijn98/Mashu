@@ -30,10 +30,7 @@ const SuggestionSchema = new mongoose.Schema({
     "creatorId": String,
     "moderator": String,
     "modId": String,
-    "state": {
-        "default": "created",
-        "type": String
-    },
+    "state": { "default": "created", "type": String },
     "content": String,
     "notificationId": String
 });
@@ -42,6 +39,7 @@ const GuildSchema = new mongoose.Schema({
     "id": String,
     "logChannel": String,
     "suggestionChannel": String,
+    "notifyCreator": { "default": false, "type": Boolean },
     "muteRole": String,
     "users": [User],
     "suggestions": [SuggestionSchema]
