@@ -20,6 +20,7 @@
     "url": "https://github.com/KurozeroPB/Mashu.git"
   },
   "scripts": {
+    "deploy": "pm2 start ecosystem.config.js --env production",
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
     "start": "cross-env NODE_ENV=production yarn lint && node --no-warnings src/index.js",
