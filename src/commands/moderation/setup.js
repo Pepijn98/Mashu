@@ -46,8 +46,9 @@ class Setup extends Command {
             if (content === "exit") return false;
 
             let channelId = "";
-            if ((/^\d{17,18}/).test(content)) {
-                channelId = content;
+            const ids = content.match(/\d{17,18}/gui);
+            if (ids.length >= 1) {
+                channelId = ids[0];
             } else {
                 const channel = msg.channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(content) > -1);
                 channelId = channel.id;
@@ -74,8 +75,9 @@ class Setup extends Command {
             if (content === "exit") return false;
 
             let channelId = "";
-            if ((/^\d{17,18}/).test(content)) {
-                channelId = content;
+            const ids = content.match(/\d{17,18}/gui);
+            if (ids.length >= 1) {
+                channelId = ids[0];
             } else {
                 const channel = msg.channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(content) > -1);
                 channelId = channel.id;
