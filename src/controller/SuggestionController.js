@@ -48,13 +48,12 @@ class SuggestionController {
      */
     async acceptSuggestion(guildId, id, moderator, client) {
         const guild = await GuildModel.findOne({ "id": guildId }).exec();
-        const accepted = await this.updateSuggestionState(guildId, id, moderator, "accepted");
+        const accepted = await this.updateSuggestionState(guild, id, moderator, "accepted");
         if (guild.notifyCreator) {
             const dm = await client.getDMChannel(accepted.creatorId);
             dm.createMessage(`Hello ${accepted.creator},\n` +
-                "Your suggestion:\n" +
-                `\`\`\`${accepted.content}\`\`\`\n` +
-                "has been accepted!");
+                "Your suggestion has been accepted!\n" +
+                `\`\`\`${accepted.content}\`\`\``);
         }
         return accepted;
     }
@@ -69,13 +68,12 @@ class SuggestionController {
      */
     async declineSuggestion(guildId, id, moderator, client) {
         const guild = await GuildModel.findOne({ "id": guildId }).exec();
-        const denied = await this.updateSuggestionState(guildId, id, moderator, "denied");
+        const denied = await this.updateSuggestionState(guild, id, moderator, "denied");
         if (guild.notifyCreator) {
             const dm = await client.getDMChannel(denied.creatorId);
             dm.createMessage(`Hello ${denied.creator},\n` +
-                "Your suggestion:\n" +
-                `\`\`\`${denied.content}\`\`\`\n` +
-                "has been denied.");
+                "Your suggestion has been denied.\n" +
+                `\`\`\`${denied.content}\`\`\`\n`);
         }
         return denied;
     }
