@@ -1,44 +1,48 @@
 {
-  "name": "mashu",
-  "version": "0.1.0",
-  "description": "Attempt to create a moderation bot",
-  "author": {
-    "email": "root@kurozeropb.info",
-    "name": "KurozeroPB",
-    "url": "https://kurozeropb.info"
-  },
-  "main": "src/index.js",
-  "license": "MIT",
-  "keywords": [],
-  "homepage": "https://github.com/KurozeroPB/Mashu#readme",
-  "bugs": {
-    "email": "root@kurozeropb.info",
-    "url": "https://github.com/KurozeroPB/Mashu/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/KurozeroPB/Mashu.git"
-  },
-  "scripts": {
-    "deploy": "pm2 start ecosystem.config.js --env production",
-    "lint": "eslint --ext .js --ignore-path .gitignore .",
-    "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
-    "start": "cross-env NODE_ENV=production yarn lint && node --no-warnings src/index.js",
-    "dev": "cross-env NODE_ENV=development node src/index.js"
-  },
-  "dependencies": {
-    "bluebird": "^3.5.3",
-    "bufferutil": "^4.0.1",
-    "chalk": "^2.4.2",
-    "cross-env": "^5.2.0",
-    "eris": "abalabahaha/eris#dev",
-    "erlpack": "abalabahaha/erlpack",
-    "moment": "^2.24.0",
-    "mongoose": "^5.4.14",
-    "winston": "^3.2.1",
-    "zlib-sync": "^0.1.4"
-  },
-  "devDependencies": {
-    "eslint": "^5.13.0"
-  }
+    "name": "mashu",
+    "version": "0.1.0",
+    "description": "Attempt to create a moderation bot",
+    "engines": {
+        "node": ">=8.0.0 <11.0.0",
+        "yarn": ">=1.16.0"
+    },
+    "author": {
+        "email": "root@kurozeropb.info",
+        "name": "KurozeroPB",
+        "url": "https://kurozeropb.info"
+    },
+    "main": "src/index.js",
+    "license": "MIT",
+    "keywords": [],
+    "homepage": "https://github.com/KurozeroPB/Mashu#readme",
+    "bugs": {
+        "email": "root@kurozeropb.info",
+        "url": "https://github.com/KurozeroPB/Mashu/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/KurozeroPB/Mashu.git"
+    },
+    "scripts": {
+        "deploy": "pm2 start ecosystem.config.js --env production",
+        "lint": "eslint --ext .js --ignore-path .gitignore .",
+        "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
+        "start": "cross-env NODE_ENV=production yarn lint && node --no-warnings src/index.js",
+        "dev": "cross-env NODE_ENV=development node src/index.js"
+    },
+    "dependencies": {
+        "bluebird": "^3.5.5",
+        "bufferutil": "^4.0.1",
+        "chalk": "^2.4.2",
+        "cross-env": "^5.2.0",
+        "eris": "^0.10.0",
+        "erlpack": "^0.1.2",
+        "moment": "^2.24.0",
+        "mongoose": "^5.5.14",
+        "winston": "^3.2.1",
+        "zlib-sync": "^0.1.4"
+    },
+    "devDependencies": {
+        "eslint": "^5.16.0"
+    }
 }
