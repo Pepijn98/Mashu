@@ -1,41 +1,36 @@
-const fs = require("fs").promises;
-const Command = require("../Command");
-const { Collection } = require("eris");
+import Collection from "@kurozero/collection";
+import Command from "../Command";
+import Logger from "./Logger";
+import { promises as fs } from "fs";
 
-class CommandLoader {
-    constructor(logger) {
+export default class CommandLoader {
+    public commands: Collection<Command>;
+    public logger: Logger;
+
+    public constructor(logger: Logger) {
         this.commands = new Collection(Command);
         this.logger = logger;
     }
 
-    /**
-     * Load all the commands
-     *
-     * @param {string} commandDir
-     * @returns {Collection<Command>}
-     */
-    async load(commandDir) {
+    /** Load all the commands */
+    public async load(commandDir: string): Promise<Collection<Command>> {
         const dirs = await fs.readdir(commandDir);
-
         for (const dir of dirs) {
             const files = await fs.readdir(`${commandDir}/${dir}`);
-
             for (const file of files) {
                 if (file.endsWith(".js")) {
-                    this._add(`${commandDir}/${dir}/${file}`, dir);
+                    await this._add(`${commandDir}/${dir}/${file}`, dir);
                 }
             }
         }
-
         return this.commands;
     }
 
-    /** @hidden */
-    _add(commandPath, category) {
+    private async _add(commandPath: string, category: string): Promise<void> {
         try {
-            Reflect.deleteProperty(require.cache, require.resolve(commandPath));
+            const cmd = await import(commandPath);
+            const command: Command = new cmd.default(category);
 
-            const command = new (require(commandPath))(category);
             if (this.commands.has(command.name)) {
                 this.logger.warn("CommandHandler", `A command with the name ${command.name} already exists and has been skipped`);
             } else {
@@ -46,5 +41,3 @@ class CommandLoader {
         }
     }
 }
-
-module.exports = CommandLoader;

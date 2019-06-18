@@ -1,30 +1,42 @@
-const { Client } = require("eris");
+import Collection from "@kurozero/collection";
+import Command from "../Command";
+import { Client, Message, Emoji, ClientOptions, AnyGuildChannel } from "eris";
+import { IActiveMessage, IReactionButton } from "../interfaces/IActiveMessage";
+import { isGuildChannel } from "./Helpers.ts";
 
-class Mashu extends Client {
-    constructor(token, options) {
+export default class Mashu extends Client {
+    public commands: Collection<Command>;
+    public activeMessages: Record<string|number|symbol, IActiveMessage>; // TODO: Maybe use a Collection for this
+    public ready: boolean = false;
+
+    public constructor(token: string, options: ClientOptions) {
         super(token, options);
 
+        this.commands = new Collection(Command);
         this.activeMessages = {};
 
         this.on("messageReactionAdd", this.onMessageReactionEvent);
         this.on("messageReactionRemove", this.onMessageReactionEvent);
     }
 
-    async onMessageReactionEvent(msg, emoji, userID) {
+    public async onMessageReactionEvent(msg: Message, emoji: Emoji, userID: string): Promise<void> {
         if (!this.ready || userID === this.user.id || !(msg.content || msg.embeds || msg.attachments)) {
             return;
         }
 
-        emoji = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
+        const emojiString = emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name;
 
         const activeMessage = this.activeMessages[msg.id];
         if (activeMessage && activeMessage.reactionButtons) {
-            const action = activeMessage.reactionButtons.find((button) => button.emoji === emoji);
+            const action = activeMessage.reactionButtons.find((button) => button.emoji === emojiString);
             if (!action) return;
 
             switch (action.type) {
                 case "cancel":
-                    await this.unwatchMessage(msg.id, msg.channel.guild && msg.channel.id);
+                    if (isGuildChannel(msg.channel)) {
+                        const channel = (msg.channel as AnyGuildChannel);
+                        await this.unwatchMessage(msg.id, channel.guild && msg.channel.id);
+                    }
                     break;
                 case "next":
                     activeMessage.queueIndex++;
@@ -50,7 +62,7 @@ class Mashu extends Client {
         }
     }
 
-    async unwatchMessage(id, channelId) {
+    public async unwatchMessage(id: string, channelId: string): Promise<void> {
         Reflect.deleteProperty(this.activeMessages, id);
 
         if (channelId) {
@@ -58,7 +70,13 @@ class Mashu extends Client {
         }
     }
 
-    async reactionButtonMessage(msg, messageQueue, reactionButtonTimeout, queueIndex, reactionButtons) {
+    public async reactionButtonMessage(
+        msg: Message,
+        messageQueue: string[],
+        reactionButtonTimeout: number,
+        queueIndex: number,
+        reactionButtons: IReactionButton[]
+    ): Promise<void> {
         let self = await this.createMessage(msg.channel.id, messageQueue[queueIndex]);
 
         reactionButtons.forEach((button) => self.addReaction(button.emoji));
@@ -74,5 +92,3 @@ class Mashu extends Client {
         };
     }
 }
-
-module.exports = Mashu;

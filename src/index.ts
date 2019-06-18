@@ -1,17 +1,13 @@
-const Eris = require("eris");
-const mongoose = require("mongoose");
-const settings = require("../settings");
-const Mashu = require("./utils/MashuClient");
-const CommandHandler = require("./utils/CommandHandler");
-const CommandLoader = require("./utils/CommandLoader");
-const GuildModel = require("./utils/Mongoose");
-const Logger = require("./utils/Logger");
+import mongoose from "mongoose";
+import settings from "../settings";
+import Mashu from "./utils/MashuClient";
+import CommandHandler from "./utils/CommandHandler";
+import CommandLoader from "./utils/CommandLoader";
+import Logger from "./utils/Logger";
+import { GuildModel } from "./utils/Mongoose";
+import { isGuildChannel } from "./utils/Helpers.ts";
+import { AnyChannel, AnyGuildChannel, Guild, Member } from "eris";
 
-// Add functions to Eris' prototype
-require("./utils/Extended")(Eris);
-
-global.Promise = require("bluebird");
-mongoose.Promise = global.Promise;
 let ready = false;
 
 const client = new Mashu(settings.token, {
@@ -43,21 +39,22 @@ client.on("messageCreate", async (msg) => {
     if (msg.author.discriminator === "0000") return; // Probably a webhook
 
     if (msg.content.startsWith(settings.prefix)) {
-        if (!msg.channel.guild && msg.author.id !== client.user.id) {
-            await commandHandler.handleCommand(msg, true);
-        } else if (msg.channel.guild) {
+        if (isGuildChannel(msg.channel) && msg.author.id !== client.user.id) {
             await commandHandler.handleCommand(msg, false);
+        } else if (msg.channel.type === 1) {
+            await commandHandler.handleCommand(msg, true);
         }
     }
 });
 
-client.on("guildCreate", async (guild) => {
+client.on("guildCreate", async (guild: Guild) => {
     const newGuild = new GuildModel({ "id": guild.id, "logChannel": "" });
     await newGuild.save();
 });
 
-client.on("channelCreate", async (channel) => {
-    if (channel.type === 0) {
+client.on("channelCreate", async (channel: AnyChannel) => {
+    if (isGuildChannel(channel)) {
+        channel = channel as AnyGuildChannel;
         const guild = await GuildModel.findOne({ "id": channel.guild.id }).exec();
         if (guild && guild.muteRole) {
             await channel.editPermission(guild.muteRole, 0, 55360, "role", "Create muted overrides");
@@ -65,7 +62,7 @@ client.on("channelCreate", async (channel) => {
     }
 });
 
-client.on("guildMemberAdd", async (guild, member) => {
+client.on("guildMemberAdd", async (guild: Guild, member: Member) => {
     const dbGuild = await GuildModel.findOne({ "id": guild.id }).exec();
     if (dbGuild && dbGuild.muteRole) {
         const user = dbGuild.users.find((u) => u.id === member.user.id);

@@ -1,0 +1,19 @@
+{
+    "extends": "./node_modules/gts/tsconfig-google.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "noImplicitAny": true,
+        "noImplicitReturns": false,
+        "esModuleInterop": true,
+        "rootDir": ".",
+        "outDir": "build",
+        "typeRoots": ["./node_modules/@types", "./src/@types"]
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
+

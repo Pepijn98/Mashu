@@ -1,13 +1,23 @@
-const GuildModel = require("./Mongoose");
+import Mashu from "./MashuClient";
+import Logger from "./Logger";
+import { Message, AnyGuildChannel } from "eris";
+import { GuildModel } from "./Mongoose";
+import { ISettings } from "../interfaces/ISettings";
+import { ICommandHandlerOptions } from "../interfaces/Options";
+import { isGuildChannel } from "./Helpers.ts";
 
-class CommandHandler {
-    constructor(options) {
+export default class CommandHandler {
+    public settings: ISettings;
+    public client: Mashu;
+    public logger: Logger;
+
+    public constructor(options: ICommandHandlerOptions) {
         this.settings = options.settings;
         this.client = options.client;
         this.logger = options.logger;
     }
 
-    async handleCommand(msg, dm) {
+    public async handleCommand(msg: Message, dm: boolean) {
         const parts = msg.content.split(" ");
         const name = parts[0].slice(this.settings.prefix.length);
 
@@ -48,10 +58,12 @@ class CommandHandler {
         }
 
         // Only check for permission if the command is used in a guild
-        if (msg.channel.guild) {
+        if (isGuildChannel(msg.channel)) {
+            const channel = msg.channel as AnyGuildChannel;
             const botPermissions = command.botPermissions;
             if (botPermissions.length > 0) {
-                const member = msg.channel.guild.members.get(this.client.user.id);
+                const member = channel.guild.members.get(this.client.user.id);
+                if (!member) return;
                 let missingPermissions = [];
                 for (let i = 0; i < botPermissions.length; i++) {
                     const hasPermission = member.permission.has(botPermissions[i]);
@@ -70,7 +82,8 @@ class CommandHandler {
 
             const userPermissions = command.userPermissions;
             if (userPermissions.length > 0) {
-                const member = msg.channel.guild.members.get(msg.author.id);
+                const member = channel.guild.members.get(msg.author.id);
+                if (!member) return;
                 let missingPermissions = [];
                 for (let i = 0; i < userPermissions.length; i++) {
                     const hasPermission = member.permission.has(userPermissions[i]);
@@ -102,5 +115,3 @@ class CommandHandler {
         }
     }
 }
-
-module.exports = CommandHandler;

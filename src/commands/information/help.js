@@ -47,7 +47,7 @@ class Help extends Command {
                 await msg.channel.createMessage(`Command \`${ctx.settings.prefix}${args[0]}\` not found`);
             } else {
                 const helpMessage = "```asciidoc\n" +
-                    `[${command.name.upperCaseFirst()}]\n\n` +
+                    `[${command.name.capitalize()}]\n\n` +
                     `= ${command.description} =\n\n` +
                     `Category           ::  ${command.category}\n` +
                     `Aliases            ::  ${command.aliases.join(", ")}\n` +

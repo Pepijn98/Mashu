@@ -1,20 +1,21 @@
-const mongoose = require("mongoose");
+import { IViolation, INote, IUser, ISuggestion, IGuild } from "../interfaces/Guild";
+import { Document, Schema, Model, model } from "mongoose";
 
-const Violation = new mongoose.Schema({
+const Violation = new Schema<IViolation>({
     "id": String,
     "timestamp": String,
     "by": String,
     "reason": String
 });
 
-const Note = new mongoose.Schema({
+const Note = new Schema<INote>({
     "id": String,
     "timestamp": String,
     "by": String,
     "message": String
 });
 
-const User = new mongoose.Schema({
+const User = new Schema<IUser>({
     "id": String,
     "isBanned": Boolean,
     "isMuted": Boolean,
@@ -24,7 +25,7 @@ const User = new mongoose.Schema({
     "notes": [Note]
 });
 
-const SuggestionSchema = new mongoose.Schema({
+const SuggestionSchema = new Schema<ISuggestion>({
     "id": Number,
     "creator": String,
     "creatorId": String,
@@ -35,8 +36,10 @@ const SuggestionSchema = new mongoose.Schema({
     "notificationId": String
 });
 
-const GuildSchema = new mongoose.Schema({
-    "id": String,
+export interface IGuildModel extends IGuild, Document {}
+
+const GuildSchema = new Schema<IGuildModel>({
+    "gid": String,
     "logChannel": String,
     "suggestionChannel": String,
     "notifyCreator": { "default": false, "type": Boolean },
@@ -45,6 +48,4 @@ const GuildSchema = new mongoose.Schema({
     "suggestions": [SuggestionSchema]
 });
 
-const GuildModel = mongoose.model("Guild", GuildSchema);
-
-module.exports = GuildModel;
+export const GuildModel: Model<IGuildModel> = model<IGuildModel>("Guild", GuildSchema);

@@ -25,12 +25,16 @@
     },
     "scripts": {
         "deploy": "pm2 start ecosystem.config.js --env production",
-        "lint": "eslint --ext .js --ignore-path .gitignore .",
-        "fix": "eslint --ext .js --ignore-path .gitignore . --fix",
-        "start": "cross-env NODE_ENV=production yarn lint && node --no-warnings src/index.js",
-        "dev": "cross-env NODE_ENV=development node src/index.js"
+        "start": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register src/index.ts",
+        "dev": "yarn test",
+        "test": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/index.ts",
+        "pretest": "yarn check",
+        "check": "gts check",
+        "clean": "gts clean",
+        "fix": "gts fix"
     },
     "dependencies": {
+        "@kurozero/collection": "^0.3.6",
         "bluebird": "^3.5.5",
         "bufferutil": "^4.0.1",
         "chalk": "^2.4.2",
@@ -43,6 +47,15 @@
         "zlib-sync": "^0.1.4"
     },
     "devDependencies": {
-        "eslint": "^5.16.0"
+        "@types/mongoose": "^5.5.6",
+        "@types/node": "^12.0.8",
+        "@typescript-eslint/eslint-plugin": "^1.10.2",
+        "@typescript-eslint/parser": "^1.10.2",
+        "eslint": "^5.16.0",
+        "gts": "^1.0.0",
+        "ts-node": "^8.3.0",
+        "tsconfig-paths": "^3.8.0",
+        "tslint": "^5.17.0",
+        "typescript": "^3.5.2"
     }
 }
