@@ -61,4 +61,4 @@ typings/
 .next
 
 # bot configs
-settings.js
+settings.ts
