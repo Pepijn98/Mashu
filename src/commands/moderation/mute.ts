@@ -1,3 +1,4 @@
+import moment, { unitOfTime } from "moment";
 import Command from "../../Command";
 import Mashu from "../../utils/MashuClient";
 import { ICommandContext } from "../../interfaces/ICommandContext";
@@ -9,7 +10,7 @@ export default class Mute extends Command {
         super({
             name: "mute",
             description: "Mute a user in the current guild",
-            usage: "mute <member: string|mention> [reason: string]",
+            usage: "mute <member: string|mention> <expires: timeString | never> [reason: string]",
             category: category,
             guildOnly: true,
             requiredArgs: 2,
@@ -24,16 +25,31 @@ export default class Mute extends Command {
 
         const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
         if (guild && guild.muteRole) {
-            const userToMute = args.shift();
+            const userToMute = args.shift() || "";
+            const expires = args.shift() || "";
             const reason = args.join(" ");
-            const member = this.findMember(msg, userToMute!);
+            const member = this.findMember(msg, userToMute);
             if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${userToMute}**`);
 
             const user = guild.users.find((u) => u.id === member.user.id);
             if (user) {
+                const time = (expires.match(/\d+/gui) || [])[0];
+                const str = (expires.match(/\D+/gui) || [])[0];
+                user.expireAt = str !== "never" ? moment(Date.now()).utc().add(time, str as unitOfTime.Base).toDate() : undefined;
                 user.isMuted = true;
             } else {
-                guild.users.push({ id: member.user.id, isBanned: false, isMuted: true, warns: [], bans: [], kicks: [], notes: [] });
+                const time = (expires.match(/\d+/gui) || [])[0];
+                const str = (expires.match(/\D+/gui) || [])[0];
+                guild.users.push({
+                    id: member.user.id,
+                    isBanned: false,
+                    isMuted: true,
+                    warns: [],
+                    bans: [],
+                    kicks: [],
+                    notes: [],
+                    expireAt: str !== "never" ? moment(Date.now()).utc().add(time, str as unitOfTime.Base).toDate() : undefined
+                });
             }
 
             if (guild.logChannel) {

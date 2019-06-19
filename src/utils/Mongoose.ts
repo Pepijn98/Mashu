@@ -22,7 +22,8 @@ const User = new Schema<IUser>({
     "warns": [Violation],
     "bans": [Violation],
     "kicks": [Violation],
-    "notes": [Note]
+    "notes": [Note],
+    "expireAt": Date
 });
 
 const SuggestionSchema = new Schema<ISuggestion>({

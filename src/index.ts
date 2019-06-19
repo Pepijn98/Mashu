@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import moment from "moment";
 import settings from "../settings";
 import Mashu from "./utils/MashuClient";
 import CommandHandler from "./utils/CommandHandler";
@@ -23,8 +24,33 @@ const commandHandler = new CommandHandler({ settings, client, logger });
 
 client.on("ready", async () => {
     if (!ready) {
-        client.commands = await commandLoader.load(`${__dirname}/commands`);
         await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
+        client.commands = await commandLoader.load(`${__dirname}/commands`);
+
+        setInterval(async () => {
+            const guilds = await GuildModel.find({}).exec();
+            for (let i = 0; i < guilds.length; i++) {
+                for (let j = 0; j < guilds[i].users.length; j++) {
+                    const user = guilds[i].users[j];
+                    if (user.expireAt) {
+                        const now = moment(Date.now()).utc().toDate();
+                        if (user.expireAt < now) {
+                            const guild = client.guilds.get(guilds[i].id);
+                            if (guild) {
+                                const guser = guild.members.get(guilds[i].users[j].id);
+                                if (guser) {
+                                    guser.removeRole(guilds[i].muteRole, "Mute reached expiration date");
+                                    user.isMuted = false;
+                                    user.expireAt = undefined;
+                                    guilds[i].users[j] = user;
+                                    await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }, 60000); // Every minute
 
         logger.ready(`Logged in as ${client.user.tag}`);
         logger.ready(`Loaded [${client.commands.size}] commands`);

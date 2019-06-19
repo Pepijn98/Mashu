@@ -20,6 +20,7 @@ export interface IUser {
     bans: IViolation[];
     kicks: IViolation[];
     notes: INote[];
+    expireAt?: Date;
 }
 
 export interface ISuggestion {

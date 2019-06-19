@@ -79,7 +79,7 @@ module.exports = {
         "consistent-this": "error",
         "curly": "off",
         "default-case": "error",
-        "dot-location": "error",
+        "dot-location": "off",
         "dot-notation": [
             "error",
             {
