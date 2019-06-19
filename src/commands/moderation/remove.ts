@@ -1,7 +1,11 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext } from "../../interfaces/ICommandContext";
+import { isGuildChannel } from "../../utils/Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
-class Remove extends Command {
-    constructor(category) {
+export default class Remove extends Command {
+    public constructor(category: string) {
         super({
             name: "remove",
             description: "Remove a violation from a user",
@@ -14,14 +18,17 @@ class Remove extends Command {
         });
     }
 
-    async run(msg, args, _client, { settings, database }) {
+    public async run(msg: Message, args: string[], _client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
         const type = args.shift();
         const id = args.shift();
         const member = this.findMember(msg, args.join(" "));
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
         try {
-            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
 
@@ -39,7 +46,7 @@ class Remove extends Command {
                     }
                 }
 
-                await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+                await database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
                 await msg.channel.createMessage(message);
             }
         } catch (error) {
@@ -52,5 +59,3 @@ class Remove extends Command {
         }
     }
 }
-
-module.exports = Remove;

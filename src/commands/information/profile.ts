@@ -1,7 +1,11 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext } from "../../interfaces/ICommandContext";
+import { isGuildChannel } from "../../utils/Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
-class Profile extends Command {
-    constructor(category) {
+export default class Profile extends Command {
+    public constructor(category: string) {
         super({
             name: "profile",
             description: "View your or someone else's profile",
@@ -11,8 +15,11 @@ class Profile extends Command {
         });
     }
 
-    async run(msg, args, _client, { settings, database }) {
-        const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+    public async run(msg: Message, args: string[], _client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
+        const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
         if (!guild) return await msg.channel.createMessage("Couldn't find current guild in the database, make sure you've ran the setup command.");
         const userToFind = args.length ? args.join(" ") : msg.author.id;
         const member = this.findMember(msg, userToFind);
@@ -21,7 +28,7 @@ class Profile extends Command {
         if (!user) {
             user = { id: member.id, isBanned: false, isMuted: false, warns: [], bans: [], kicks: [], notes: [] };
             guild.users.push(user);
-            await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+            await database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
         }
 
         let note = "```diff\n";
@@ -47,10 +54,10 @@ class Profile extends Command {
                     `Joined At: ${(new Date(member.joinedAt)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })}\n\n` +
                     `Most recent notes:\n${note}`,
                 fields: [
-                    { name: "Warns", value: user.warns.length, inline: true },
-                    { name: "Kicks", value: user.kicks.length, inline: true },
-                    { name: "Bans", value: user.bans.length, inline: true },
-                    { name: "Notes", value: user.notes.length ? user.notes.length : "99+", inline: true }
+                    { name: "Warns", value: String(user.warns.length), inline: true },
+                    { name: "Kicks", value: String(user.kicks.length), inline: true },
+                    { name: "Bans", value: String(user.bans.length), inline: true },
+                    { name: "Notes", value: user.notes.length ? String(user.notes.length) : "99+", inline: true }
                 ],
                 footer: {
                     text: `ID: ${member.id}`
@@ -59,5 +66,3 @@ class Profile extends Command {
         });
     }
 }
-
-module.exports = Profile;

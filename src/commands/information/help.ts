@@ -1,7 +1,10 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { Message } from "eris";
+import { ICommandContext } from "../../interfaces/ICommandContext";
 
-class Help extends Command {
-    constructor(category) {
+export default class Help extends Command {
+    public constructor(category: string) {
         super({
             name: "help",
             description: "send info about the commands",
@@ -10,9 +13,9 @@ class Help extends Command {
         });
     }
 
-    async run(msg, args, client, ctx) {
+    public async run(msg: Message, args: string[], client: Mashu, ctx: ICommandContext): Promise<Message | undefined> {
         if (args.length === 0) {
-            let messageQueue = [];
+            let messageQueue: string[] = [];
             let currentMessage = `\n# Here's a list of my commands. For more info do: ${ctx.settings.prefix}help <command>\n# Prefix: ${ctx.settings.prefix}\n`;
             client.commands.forEach((command) => {
                 if (command.hidden === true) return; // Command is hidden
@@ -38,34 +41,33 @@ class Help extends Command {
             }, 300);
         } else {
             const command = this.checkForMatch(args[0], client, ctx);
+            if (!command) return await msg.channel.createMessage(`Command \`${ctx.settings.prefix}${args[0]}\` not found`);
+
             if (command.hidden === true) return; // Command is hidden
             if (command.ownerOnly && msg.author.id !== ctx.settings.owner) {
                 return await msg.channel.createMessage("This command can only be viewed and used by the owner.");
             }
 
-            if (command === null) {
-                await msg.channel.createMessage(`Command \`${ctx.settings.prefix}${args[0]}\` not found`);
-            } else {
-                const helpMessage = "```asciidoc\n" +
-                    `[${command.name.capitalize()}]\n\n` +
-                    `= ${command.description} =\n\n` +
-                    `Category           ::  ${command.category}\n` +
-                    `Aliases            ::  ${command.aliases.join(", ")}\n` +
-                    `Usage              ::  ${ctx.settings.prefix}${command.usage}\n` +
-                    `Guild Only         ::  ${command.guildOnly ? "yes" : "no"}\n` +
-                    `Owner Only         ::  ${command.ownerOnly ? "yes" : "no"}\n` +
-                    `Required Args      ::  ${command.requiredArgs}\n` +
-                    `User Permissions   ::  ${command.userPermissions.join(", ")}\n` +
-                    `Bot Permissions    ::  ${command.botPermissions.join(", ")}\n\n` +
-                    "<> = required\n" +
-                    "[] = optional\n" +
-                    "```";
-                await msg.channel.createMessage(helpMessage);
-            }
+            const helpMessage = "```asciidoc\n" +
+                `[${command.name.capitalize()}]\n\n` +
+                `= ${command.description} =\n\n` +
+                `Category           ::  ${command.category}\n` +
+                `Aliases            ::  ${command.aliases.join(", ")}\n` +
+                `Usage              ::  ${ctx.settings.prefix}${command.usage}\n` +
+                `Hidden             ::  ${command.hidden ? "yes" : "no"}\n` +
+                `Guild Only         ::  ${command.guildOnly ? "yes" : "no"}\n` +
+                `Owner Only         ::  ${command.ownerOnly ? "yes" : "no"}\n` +
+                `Required Args      ::  ${command.requiredArgs}\n` +
+                `User Permissions   ::  ${command.userPermissions.join(", ")}\n` +
+                `Bot Permissions    ::  ${command.botPermissions.join(", ")}\n\n` +
+                "<> = required\n" +
+                "[] = optional\n" +
+                "```";
+            await msg.channel.createMessage(helpMessage);
         }
     }
 
-    checkForMatch(name, client, ctx) {
+    public checkForMatch(name: string, client: Mashu, ctx: ICommandContext): Command | undefined {
         if (name.startsWith(ctx.settings.prefix)) {
             name = name.substr(1);
         }
@@ -73,5 +75,3 @@ class Help extends Command {
         return client.commands.find((cmd) => cmd.name === name || cmd.aliases.indexOf(name) !== -1);
     }
 }
-
-module.exports = Help;

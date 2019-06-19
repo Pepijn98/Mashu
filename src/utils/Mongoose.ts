@@ -36,10 +36,11 @@ const SuggestionSchema = new Schema<ISuggestion>({
     "notificationId": String
 });
 
+// @ts-ignore
 export interface IGuildModel extends IGuild, Document {}
 
 const GuildSchema = new Schema<IGuildModel>({
-    "gid": String,
+    "id": String,
     "logChannel": String,
     "suggestionChannel": String,
     "notifyCreator": { "default": false, "type": Boolean },

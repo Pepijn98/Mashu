@@ -1,7 +1,11 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext } from "../../interfaces/ICommandContext";
+import { isGuildChannel } from "../../utils/Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
-class Warn extends Command {
-    constructor(category) {
+export default class Warn extends Command {
+    public constructor(category: string) {
         super({
             name: "warn",
             description: "Warn a user from the current guild",
@@ -14,15 +18,18 @@ class Warn extends Command {
         });
     }
 
-    async run(msg, args, client, { settings, database }) {
-        const userToWarn = args.shift();
+    public async run(msg: Message, args: string[], client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
+        const userToWarn = args.shift() || "";
         const member = this.findMember(msg, userToWarn);
 
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
         const reason = args.join(" ");
         try {
-            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
                 const newWarn = { id: this.generateId(), timestamp: (new Date()).toISOString(), by: msg.author.id, reason: reason };
@@ -31,7 +38,7 @@ class Warn extends Command {
                     user.warns.push(newWarn);
                     warnCount = user.warns.length;
                 } else {
-                    guild.users.push({ id: member.user.id, warns: [newWarn] });
+                    guild.users.push({ id: member.user.id, isBanned: false, isMuted: false, warns: [newWarn], bans: [], kicks: [], notes: [] });
                 }
 
                 if (guild.logChannel) {
@@ -49,7 +56,7 @@ class Warn extends Command {
                     });
                 }
 
-                await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+                await database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
             }
         } catch (error) {
             return await msg.channel.createMessage({
@@ -61,8 +68,8 @@ class Warn extends Command {
         }
 
         try {
-            const channel = await member.user.getDMChannel();
-            await channel.createMessage(`You have been warned in: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
+            const chan = await member.user.getDMChannel();
+            await chan.createMessage(`You have been warned in: **${channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
         } catch (error) {
             await msg.channel.createMessage("Couldn't DM the banned member.");
         }

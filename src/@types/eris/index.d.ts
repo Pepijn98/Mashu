@@ -2,7 +2,7 @@ import { IMessageCollectorOptions } from "../../interfaces/Options";
 
 declare module "eris" {
     interface Channel {
-        awaitMessages(filter: (message: Message) => boolean, options: IMessageCollectorOptions): Promise<any>
+        awaitMessages(filter: (message: Message) => boolean, options: IMessageCollectorOptions): Promise<any>;
     }
 
     interface User {

@@ -1,7 +1,11 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext } from "../../interfaces/ICommandContext";
+import { isGuildChannel } from "../../utils/Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
-class Kick extends Command {
-    constructor(category) {
+export default class Kick extends Command {
+    public constructor(category: string) {
         super({
             name: "kick",
             description: "Kick a user from the current guild",
@@ -14,17 +18,20 @@ class Kick extends Command {
         });
     }
 
-    async run(msg, args, client, { settings, database }) {
+    public async run(msg: Message, args: string[], client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
         const userToKick = args.shift();
         const reason = args.join(" ");
-        const member = this.findMember(msg, userToKick);
+        const member = this.findMember(msg, userToKick!);
 
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
         try {
             await member.kick(reason);
 
-            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
                 const newKick = { id: this.generateId(), timestamp: (new Date()).toISOString(), by: msg.author.id, reason: reason };
@@ -33,7 +40,7 @@ class Kick extends Command {
                     user.kicks.push(newKick);
                     kickCount = user.kicks.length;
                 } else {
-                    guild.users.push({ id: member.user.id, kicks: [newKick] });
+                    guild.users.push({ id: member.user.id, isBanned: false, isMuted: false, warns: [], bans: [], kicks: [newKick], notes: [] });
                 }
 
                 if (guild.logChannel) {
@@ -51,7 +58,7 @@ class Kick extends Command {
                     });
                 }
 
-                await database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+                await database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
             }
         } catch (error) {
             return await msg.channel.createMessage({
@@ -63,12 +70,10 @@ class Kick extends Command {
         }
 
         try {
-            const channel = await member.user.getDMChannel();
-            await channel.createMessage(`You have been kicked from: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
+            const dm = await member.user.getDMChannel();
+            await dm.createMessage(`You have been kicked from: **${channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
         } catch (error) {
             await msg.channel.createMessage("Couldn't DM the banned member.");
         }
     }
 }
-
-module.exports = Kick;

@@ -1,8 +1,11 @@
-const Command = require("../../Command");
-const { sleep } = require("../../utils/Helpers");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext, IDatabaseContext } from "../../interfaces/ICommandContext";
+import { isGuildChannel, sleep } from "../../utils/Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
-class Setup extends Command {
-    constructor(category) {
+export default class Setup extends Command {
+    public constructor(category: string) {
         super({
             name: "setup",
             description: "Setup some basic moderation info",
@@ -13,7 +16,7 @@ class Setup extends Command {
         });
     }
 
-    async run(msg, _args, _client, { database }) {
+    public async run(msg: Message, _args: string[], _client: Mashu, { database }: ICommandContext): Promise<Message | undefined> {
         await msg.channel.createMessage(`Hello ${msg.author.mention}, I'm gonna ask you a series of questions starting in 5 seconds.\nPlease reply within 15 seconds for each question.\nType \`exit\` at anytime to stop.`);
         await sleep(5000);
 
@@ -33,7 +36,10 @@ class Setup extends Command {
         await msg.channel.createMessage(`${msg.author.mention}, That was the last question. Setup successfully completed!`);
     }
 
-    async askLogChannel(msg, database) {
+    public async askLogChannel(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
         await msg.channel.createMessage(`${msg.author.mention}, What will be the log channel?\nPlease reply with either the channel name, id or mention the channel.`);
 
         let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
@@ -50,19 +56,22 @@ class Setup extends Command {
             if (ids.length >= 1) {
                 channelId = ids[0];
             } else {
-                const channel = msg.channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(content) > -1);
-                channelId = channel.id;
-                if (!channel) return await msg.channel.createMessage("Couldn't find a channel with that name.");
+                const chan = channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(content) > -1);
+                channelId = chan.id;
+                if (!chan) return await msg.channel.createMessage("Couldn't find a channel with that name.");
             }
 
-            await database.guild.updateOne({ "id": msg.channel.guild.id }, { "logChannel": channelId });
+            await database.guild.updateOne({ "id": channel.guild.id }, { "logChannel": channelId });
             await msg.channel.createMessage(`Changed log channel to <#${channelId}>`);
         } else {
             await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);
         }
     }
 
-    async askSuggestionChannel(msg, database) {
+    public async askSuggestionChannel(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
         await msg.channel.createMessage(`${msg.author.mention}, What will be the suggestions channel?\nPlease reply with either the channel name, id or mention the channel.`);
 
         let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
@@ -79,19 +88,22 @@ class Setup extends Command {
             if (ids.length >= 1) {
                 channelId = ids[0];
             } else {
-                const channel = msg.channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(content) > -1);
-                channelId = channel.id;
-                if (!channel) return await msg.channel.createMessage("Couldn't find a channel with that name.");
+                const chan = channel.guild.channels.find((c) => c.name.toLowerCase().indexOf(content) > -1);
+                channelId = chan.id;
+                if (!chan) return await msg.channel.createMessage("Couldn't find a channel with that name.");
             }
 
-            await database.guild.updateOne({ "id": msg.channel.guild.id }, { "suggestionChannel": channelId });
+            await database.guild.updateOne({ "id": channel.guild.id }, { "suggestionChannel": channelId });
             await msg.channel.createMessage(`Changed log channel to <#${channelId}>`);
         } else {
             await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);
         }
     }
 
-    async askNotifyCreator(msg, database) {
+    public async askNotifyCreator(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
         await msg.channel.createMessage(`${msg.author.mention}, Do you want to notify the creator of a suggestion when it gets accepted or denied?\nPlease reply with either (y)es or (n)o.`);
 
         let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
@@ -106,14 +118,17 @@ class Setup extends Command {
             const update = content.toLowerCase().startsWith("y") ? true : content.toLowerCase().startsWith("n") ? false : null;
             if (!update) return await msg.channel.createMessage("Invalid reply, reply with either yes or no.");
 
-            await database.guild.updateOne({ "id": msg.channel.guild.id }, { "notifyCreator": update });
+            await database.guild.updateOne({ "id": channel.guild.id }, { "notifyCreator": update });
             await msg.channel.createMessage(update ? "Okay! I will notify the creator whenever their suggestion gets updated." : "Okay! I won't notify the suggestion creators.");
         } else {
             await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);
         }
     }
 
-    async createMuteRole(msg, database) {
+    public async createMuteRole(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
         await msg.channel.createMessage(`${msg.author.mention}, Do you want to create a new muted role?\nPlease reply with either (y)es or (n)o.`);
 
         let responses = await msg.channel.awaitMessages((m) => m.author.id === msg.author.id, { time: 15000, maxMatches: 1 });
@@ -126,28 +141,28 @@ class Setup extends Command {
             if (content === "exit") return false;
 
             if (content.startsWith("y")) {
-                const newRole = await msg.channel.guild.createRole({ name: "Muted", permissions: 0, hoist: false, mentionable: false }, "[Chloe] Default muted role");
-                await database.guild.updateOne({ "id": msg.channel.guild.id }, { "muteRole": newRole.id });
+                const newRole = await channel.guild.createRole({ name: "Muted", permissions: 0, hoist: false, mentionable: false }, "[Chloe] Default muted role");
+                await database.guild.updateOne({ "id": channel.guild.id }, { "muteRole": newRole.id });
                 await msg.channel.createMessage(`Created new role with the name **${newRole.name}** and saved it as the default mute role.`);
-                for (let item of msg.channel.guild.channels) {
-                    const channel = item[1];
-                    const override = channel.permissionOverwrites.find((o) => o.id === newRole.id);
+                for (let item of channel.guild.channels) {
+                    const chan = item[1];
+                    const override = chan.permissionOverwrites.find((o) => o.id === newRole.id);
                     if ((override && override.deny !== 55360) || (!override)) {
-                        await channel.editPermission(newRole.id, 0, 55360, "role", "Create muted overrides");
+                        await chan.editPermission(newRole.id, 0, 55360, "role", "Create muted overrides");
                     }
                 }
             } else if (content.startsWith("n")) {
-                let muted = msg.channel.guild.roles.find((role) => role.name.toLowerCase() === "muted");
+                let muted = channel.guild.roles.find((role) => role.name.toLowerCase() === "muted");
                 if (!muted) {
                     await msg.channel.createMessage("Tried to find a role with the name `muted` but couldn't find anything.\nMuted setup incorrectly please run this command again.");
                 } else {
-                    await database.guild.updateOne({ "id": msg.channel.guild.id }, { "muteRole": muted.id });
+                    await database.guild.updateOne({ "id": channel.guild.id }, { "muteRole": muted.id });
                     await msg.channel.createMessage(`Found a role with the name **${muted.name}** and saved it as the default mute role.`);
-                    for (let item of msg.channel.guild.channels) {
-                        const channel = item[1];
-                        const override = channel.permissionOverwrites.find((o) => o.id === muted.id);
+                    for (let item of channel.guild.channels) {
+                        const chan = item[1];
+                        const override = chan.permissionOverwrites.find((o) => o.id === muted.id);
                         if ((override && override.deny !== 55360) || (!override)) {
-                            await channel.editPermission(muted.id, 0, 55360, "role", "Create muted overrides");
+                            await chan.editPermission(muted.id, 0, 55360, "role", "Create muted overrides");
                         }
                     }
                 }
@@ -157,5 +172,3 @@ class Setup extends Command {
         }
     }
 }
-
-module.exports = Setup;

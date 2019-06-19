@@ -1,10 +1,10 @@
 import Mashu from "./MashuClient";
 import Logger from "./Logger";
-import { Message, AnyGuildChannel } from "eris";
 import { GuildModel } from "./Mongoose";
 import { ISettings } from "../interfaces/ISettings";
 import { ICommandHandlerOptions } from "../interfaces/Options";
-import { isGuildChannel } from "./Helpers.ts";
+import { isGuildChannel } from "./Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
 export default class CommandHandler {
     public settings: ISettings;
@@ -17,7 +17,7 @@ export default class CommandHandler {
         this.logger = options.logger;
     }
 
-    public async handleCommand(msg: Message, dm: boolean) {
+    public async handleCommand(msg: Message, dm: boolean): Promise<boolean | undefined> {
         const parts = msg.content.split(" ");
         const name = parts[0].slice(this.settings.prefix.length);
 

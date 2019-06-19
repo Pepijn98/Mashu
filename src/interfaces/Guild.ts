@@ -34,7 +34,7 @@ export interface ISuggestion {
 }
 
 export interface IGuild {
-    gid: string;
+    id: string;
     logChannel: string;
     suggestionChannel: string;
     notifyCreator: boolean;

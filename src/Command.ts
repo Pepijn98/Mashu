@@ -2,9 +2,9 @@ import Mashu from "./utils/MashuClient";
 import { ICommandOptions } from "./interfaces/Options";
 import { isGuildChannel } from "./utils/Helpers";
 import { ICommandContext } from "./interfaces/ICommandContext";
-import { Message, Guild, AnyGuildChannel } from "eris";
+import { Message, Guild, AnyGuildChannel, Member } from "eris";
 
-export default class Command {
+export default abstract class Command {
     public _key: string;
 
     public name: string;
@@ -12,6 +12,7 @@ export default class Command {
     public usage: string;
     public category: string;
     public aliases: string[];
+    public hidden: boolean;
     public guildOnly: boolean
     public ownerOnly: boolean;
     public requiredArgs: number;
@@ -26,6 +27,7 @@ export default class Command {
         this.usage = options.usage;
         this.category = options.category || "general";
         this.aliases = options.aliases || [];
+        this.hidden = options.hidden || false;
         this.guildOnly = options.guildOnly || false;
         this.ownerOnly = options.ownerOnly || false;
         this.requiredArgs = options.requiredArgs || 0;
@@ -33,28 +35,23 @@ export default class Command {
         this.botPermissions = options.botPermissions || ["readMessages", "sendMessages"];
     }
 
-    public async run(msg: Message, args: string[], client: Mashu, context: ICommandContext): Promise<any> {}
+    public abstract async run(msg: Message, args: string[], client: Mashu, context: ICommandContext): Promise<any>;
 
-    /**
-     * Tries to find the user in the currently guild
-     *
-     * @param {Eris.Message} msg
-     * @param {string} str
-     */
-    public findMember(msg: Message, str: string) {
+    /** Tries to find the user in the currently guild */
+    public findMember(msg: Message, str: string): false | Member {
         if (!str || str === "") return false;
 
         let guild: Guild | null = null;
         if (isGuildChannel(msg.channel))
             guild = (msg.channel as AnyGuildChannel).guild;
 
-        if (!guild) return msg.mentions[0] ? msg.mentions[0] : false;
+        if (!guild) return false;
 
-        if ((/^\d{17,18}/).test(str) || (/^<@!?\d{17,18}>/).test(str)) {
-            const member = guild.members.get((/^<@!?\d{17,18}>/).test(str) ? str.replace(/<@!?/, "").replace(">", "") : str);
+        if ((/^\d{17,18}/u).test(str) || (/^<@!?\d{17,18}>/u).test(str)) {
+            const member = guild.members.get((/^<@!?\d{17,18}>/u).test(str) ? str.replace(/<@!?/u, "").replace(">", "") : str);
             return member ? member : false;
         } else if (str.length <= 33) {
-            const isMemberName = (name: string, something: string) => name === something || name.startsWith(something) || name.includes(something);
+            const isMemberName = (name: string, something: string): boolean => name === something || name.startsWith(something) || name.includes(something);
             const member = guild.members.find((m) => (m.nick && isMemberName(m.nick.toLowerCase(), str.toLowerCase())) ? true : isMemberName(m.user.username.toLowerCase(), str.toLowerCase()));
             return member ? member : false;
         }
@@ -62,7 +59,7 @@ export default class Command {
         return false;
     }
 
-    public generateId() {
+    public generateId(): string {
         return `_${Math.random().toString(36).substr(2, 9)}`;
     }
 }

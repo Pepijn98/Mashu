@@ -1,7 +1,10 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext } from "../../interfaces/ICommandContext";
+import { Message } from "eris";
 
-class Eval extends Command {
-    constructor(category) {
+export default class Eval extends Command {
+    public constructor(category: string) {
         super({
             name: "eval",
             description: "Evaluate javascript code",
@@ -12,7 +15,7 @@ class Eval extends Command {
         });
     }
 
-    async run(msg, args, client, ctx) {
+    public async run(msg: Message, _args: string[], _client: Mashu, ctx: ICommandContext): Promise<void> {
         ctx.logger.info("EVAL", `${msg.author.username}: ${msg.content}`);
 
         let toEval = msg.content.replace(`${ctx.settings.prefix}eval`, "").trim();
@@ -31,5 +34,3 @@ class Eval extends Command {
         }
     }
 }
-
-module.exports = Eval;

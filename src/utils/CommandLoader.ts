@@ -1,6 +1,6 @@
-import Collection from "@kurozero/collection";
 import Command from "../Command";
 import Logger from "./Logger";
+import Collection from "@kurozero/collection";
 import { promises as fs } from "fs";
 
 export default class CommandLoader {
@@ -18,7 +18,7 @@ export default class CommandLoader {
         for (const dir of dirs) {
             const files = await fs.readdir(`${commandDir}/${dir}`);
             for (const file of files) {
-                if (file.endsWith(".js")) {
+                if (file.endsWith(".ts")) {
                     await this._add(`${commandDir}/${dir}/${file}`, dir);
                 }
             }

@@ -1,7 +1,8 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import { Message } from "eris";
 
-class Ping extends Command {
-    constructor(category) {
+export default class Ping extends Command {
+    public constructor(category: string) {
         super({
             name: "ping",
             description: "Testing the bot",
@@ -10,9 +11,7 @@ class Ping extends Command {
         });
     }
 
-    async run(msg) {
+    public async run(msg: Message): Promise<void> {
         await msg.channel.createMessage("Pong!");
     }
 }
-
-module.exports = Ping;

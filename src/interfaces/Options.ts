@@ -1,6 +1,6 @@
 import Mashu from "../utils/MashuClient";
 import Logger from "../utils/Logger";
-import { ISettings } from "./ISettings.ts";
+import { ISettings } from "./ISettings";
 
 export interface ICommandHandlerOptions {
     settings: ISettings;
@@ -14,6 +14,7 @@ export interface ICommandOptions {
     usage: string;
     category?: string | null;
     aliases?: string[] | null;
+    hidden?: boolean | null;
     guildOnly?: boolean | null;
     ownerOnly?: boolean | null;
     requiredArgs?: number | null;

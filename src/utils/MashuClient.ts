@@ -1,8 +1,8 @@
 import Collection from "@kurozero/collection";
 import Command from "../Command";
-import { Client, Message, Emoji, ClientOptions, AnyGuildChannel } from "eris";
+import { isGuildChannel } from "./Helpers";
 import { IActiveMessage, IReactionButton } from "../interfaces/IActiveMessage";
-import { isGuildChannel } from "./Helpers.ts";
+import { Client, Message, Emoji, ClientOptions, AnyGuildChannel } from "eris";
 
 export default class Mashu extends Client {
     public commands: Collection<Command>;

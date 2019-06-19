@@ -1,7 +1,7 @@
+import { IMessageCollectorOptions } from "src/interfaces/Options";
+import { isGuildChannel } from "./Helpers";
 import { EventEmitter } from "events";
 import { AnyChannel, Channel, User, Member, Message, Client, AnyGuildChannel } from "eris";
-import { IMessageCollectorOptions } from "src/interfaces/Options";
-import { isGuildChannel } from "./Helpers.ts";
 
 export class MessageCollector extends EventEmitter {
     public filter: (message: Message) => boolean;
@@ -26,7 +26,7 @@ export class MessageCollector extends EventEmitter {
         if (options.time) setTimeout(() => this.stop("time"), options.time);
     }
 
-    public verify(message: Message) {
+    public verify(message: Message): boolean {
         if (this.channel.id !== message.channel.id) return false;
         if (this.filter(message)) {
             this.collected.push(message);
@@ -37,7 +37,7 @@ export class MessageCollector extends EventEmitter {
         return false;
     }
 
-    public stop(reason: string) {
+    public stop(reason: string): void {
         if (this.ended) return;
         this.ended = true;
         this.bot.removeListener("messageCreate", this.listener);
@@ -45,10 +45,12 @@ export class MessageCollector extends EventEmitter {
     }
 }
 
+// eslint-disable-next-line no-extend-native
 String.prototype.capitalize = function(): string {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
+// eslint-disable-next-line no-extend-native
 Array.prototype.paginate = function(pageSize: number, pageNumber: number): any[] {
     --pageNumber;
     return this.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);

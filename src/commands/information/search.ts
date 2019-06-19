@@ -1,7 +1,11 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext } from "../../interfaces/ICommandContext";
+import { isGuildChannel } from "../../utils/Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
-class Search extends Command {
-    constructor(category) {
+export default class Search extends Command {
+    public constructor(category: string) {
         super({
             name: "search",
             description: "Search for a user entry in the database",
@@ -13,12 +17,15 @@ class Search extends Command {
         });
     }
 
-    async run(msg, args, _client, { settings, database }) {
+    public async run(msg: Message, args: string[], _client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
         const member = this.findMember(msg, args[1]);
         if (!member) return await msg.channel.createMessage("Couldn't find a member.");
 
         try {
-            const guild = await database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+            const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
             if (guild) {
                 const user = guild.users.find((o) => o.id === member.user.id);
                 if (user) {
@@ -36,10 +43,12 @@ class Search extends Command {
                                     message = "```md\n";
                                 }
 
+                                const mod = channel.guild.members.get(user.bans[i].by);
+
                                 let num = i + 1;
                                 message += `[${num}](${(new Date(user.bans[i].timestamp)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })})\n` +
                                     `ID:        ${user.bans[i].id}\n` +
-                                    `Banned by: ${msg.channel.guild.members.get(user.bans[i].by).user.username}\n` +
+                                    `Banned by: ${mod ? mod.user.username : "Unknown"}\n` +
                                     `Reason:    ${user.bans[i].reason}\n\n`;
                             }
                             message += "```";
@@ -56,10 +65,12 @@ class Search extends Command {
                                     message = "```md\n";
                                 }
 
+                                const mod = channel.guild.members.get(user.kicks[i].by);
+
                                 let num = i + 1;
                                 message += `[${num}](${(new Date(user.kicks[i].timestamp)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })})\n` +
                                     `ID:        ${user.kicks[i].id}\n` +
-                                    `Kicked by: ${msg.channel.guild.members.get(user.kicks[i].by).user.username}\n` +
+                                    `Kicked by: ${mod ? mod.user.username : "Unknown"}\n` +
                                     `Reason:    ${user.kicks[i].reason}\n\n`;
                             }
                             message += "```";
@@ -76,10 +87,12 @@ class Search extends Command {
                                     message = "```md\n";
                                 }
 
+                                const mod = channel.guild.members.get(user.warns[i].by);
+
                                 let num = i + 1;
                                 message += `[${num}](${(new Date(user.warns[i].timestamp)).toLocaleString("en-GB", { hour12: true, timeZone: "UTC" })})\n` +
                                     `ID:        ${user.warns[i].id}\n` +
-                                    `Warned by: ${msg.channel.guild.members.get(user.warns[i].by).user.username}\n` +
+                                    `Warned by: ${mod ? mod.user.username : "Unknown"}\n` +
                                     `Reason:    ${user.warns[i].reason}\n\n`;
                             }
                             message += "```";
@@ -104,5 +117,3 @@ class Search extends Command {
         }
     }
 }
-
-module.exports = Search;

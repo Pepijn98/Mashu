@@ -1,7 +1,7 @@
 import Mashu from "../utils/MashuClient";
 import { GuildModel, IGuildModel } from "../utils/Mongoose";
 import { ISuggestion } from "../interfaces/Guild";
-import { User, Guild } from "eris";
+import { User } from "eris";
 
 export default class SuggestionController {
     /** Create a new Suggestion */
@@ -45,7 +45,7 @@ export default class SuggestionController {
             if (accepted) {
                 if (guild.notifyCreator) {
                     const dm = await client.getDMChannel(accepted.creatorId);
-                    dm.createMessage(`Hello ${accepted.creator},\n` + "Your suggestion has been accepted!\n" + `\`\`\`${accepted.content}\`\`\``);
+                    dm.createMessage(`Hello ${accepted.creator},\nYour suggestion has been accepted!\n\`\`\`${accepted.content}\`\`\``);
                 }
                 return accepted;
             } else {
@@ -64,7 +64,7 @@ export default class SuggestionController {
             if (denied) {
                 if (guild.notifyCreator) {
                     const dm = await client.getDMChannel(denied.creatorId);
-                    dm.createMessage(`Hello ${denied.creator},\n` + "Your suggestion has been denied.\n" + `\`\`\`${denied.content}\`\`\`\n`);
+                    dm.createMessage(`Hello ${denied.creator},\nYour suggestion has been denied.\n\`\`\`${denied.content}\`\`\`\n`);
                 }
                 return denied;
             } else {

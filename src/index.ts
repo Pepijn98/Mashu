@@ -5,8 +5,10 @@ import CommandHandler from "./utils/CommandHandler";
 import CommandLoader from "./utils/CommandLoader";
 import Logger from "./utils/Logger";
 import { GuildModel } from "./utils/Mongoose";
-import { isGuildChannel } from "./utils/Helpers.ts";
+import { isGuildChannel } from "./utils/Helpers";
 import { AnyChannel, AnyGuildChannel, Guild, Member } from "eris";
+
+import "./utils/Extended";
 
 let ready = false;
 

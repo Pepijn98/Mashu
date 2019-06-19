@@ -1,7 +1,11 @@
-const Command = require("../../Command");
+import Command from "../../Command";
+import Mashu from "../../utils/MashuClient";
+import { ICommandContext } from "../../interfaces/ICommandContext";
+import { isGuildChannel } from "../../utils/Helpers";
+import { Message, AnyGuildChannel } from "eris";
 
-class Note extends Command {
-    constructor(category) {
+export default class Note extends Command {
+    public constructor(category: string) {
         super({
             name: "note",
             description: "Add, remove, update or view notes for a user in the current guild =\n" +
@@ -17,9 +21,9 @@ class Note extends Command {
         });
     }
 
-    async run(msg, args, client, ctx) {
+    public async run(msg: Message, args: string[], client: Mashu, ctx: ICommandContext): Promise<void> {
         const action = args.shift();
-        const username = args.shift();
+        const username = args.shift() || "";
         const note = args.join(" ");
 
         switch (action) {
@@ -45,35 +49,43 @@ class Note extends Command {
         }
     }
 
-    async addNote(msg, noteMessage, username, ctx) {
-        const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+    public async addNote(msg: Message, noteMessage: string, username: string, ctx: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
+        const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();
+        if (!guild) return await msg.channel.createMessage("Could not find guild");
         const member = this.findMember(msg, username);
         if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${username}**`);
 
         let user = guild.users.find((u) => u.id === member.id);
         if (!user) {
             user = { id: member.id, isBanned: false, isMuted: false, warns: [], bans: [], kicks: [], notes: [] };
-            guild.users.add(user);
-            await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+            guild.users.push(user);
+            await ctx.database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
         }
 
         const note = { id: this.generateId(), timestamp: (new Date()).toISOString(), by: msg.author.id, message: noteMessage };
         user.notes.push(note);
 
-        await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+        await ctx.database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
         await msg.channel.createMessage(`New note added (id: ${note.id})`);
     }
 
-    async removeNote(msg, username, client, ctx) {
-        const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+    public async removeNote(msg: Message, username: string, client: Mashu, ctx: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
+        const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();
+        if (!guild) return await msg.channel.createMessage("Could not find guild");
         const member = this.findMember(msg, username);
         if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${username}**`);
 
         let user = guild.users.find((u) => u.id === member.id);
         if (!user) {
             user = { id: member.id, isBanned: false, isMuted: false, warns: [], bans: [], kicks: [], notes: [] };
-            guild.users.add(user);
-            await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+            guild.users.push(user);
+            await ctx.database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
         }
 
         const notes = Array.from(user.notes);
@@ -128,7 +140,7 @@ class Note extends Command {
 
                 user.notes = user.notes.filter((n) => n.id !== content);
 
-                await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild);
+                await ctx.database.guild.updateOne({ "id": channel.guild.id }, guild);
                 await msg.channel.createMessage(`Removed note \`${content}\` from **${member.nick ? member.nick : member.username}**`);
             } else {
                 await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);
@@ -138,16 +150,20 @@ class Note extends Command {
         }
     }
 
-    async updateNote(msg, username, client, ctx) { // eslint-disable-line no-unused-vars
-        const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+    public async updateNote(msg: Message, username: string, client: Mashu, ctx: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
+        const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();
+        if (!guild) return await msg.channel.createMessage("Could not find guild");
         const member = this.findMember(msg, username);
         if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${username}**`);
 
         let user = guild.users.find((u) => u.id === member.id);
         if (!user) {
             user = { id: member.id, isBanned: false, isMuted: false, warns: [], bans: [], kicks: [], notes: [] };
-            guild.users.add(user);
-            await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+            guild.users.push(user);
+            await ctx.database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
         }
 
         const notes = Array.from(user.notes);
@@ -206,7 +222,7 @@ class Note extends Command {
 
                 note.message = newReason;
 
-                await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild);
+                await ctx.database.guild.updateOne({ "id": channel.guild.id }, guild);
                 await msg.channel.createMessage(`Updated note \`${id}\` from **${member.nick ? member.nick : member.username}**`);
             } else {
                 await msg.channel.createMessage(`${msg.author.mention}, Times up! You've waited too long to respond.`);
@@ -216,16 +232,20 @@ class Note extends Command {
         }
     }
 
-    async viewNotes(msg, username, client, ctx) {
-        const guild = await ctx.database.guild.findOne({ "id": msg.channel.guild.id }).exec();
+    public async viewNotes(msg: Message, username: string, client: Mashu, ctx: ICommandContext): Promise<Message | undefined> {
+        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        const channel = msg.channel as AnyGuildChannel;
+
+        const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();
+        if (!guild) return await msg.channel.createMessage("Could not find guild");
         const member = this.findMember(msg, username);
         if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${username}**`);
 
         let user = guild.users.find((u) => u.id === member.id);
         if (!user) {
             user = { id: member.id, isBanned: false, isMuted: false, warns: [], bans: [], kicks: [], notes: [] };
-            guild.users.add(user);
-            await ctx.database.guild.updateOne({ "id": msg.channel.guild.id }, guild).exec();
+            guild.users.push(user);
+            await ctx.database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
         }
 
         const notes = Array.from(user.notes);
@@ -270,5 +290,3 @@ class Note extends Command {
         }
     }
 }
-
-module.exports = Note;
