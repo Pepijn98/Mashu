@@ -73,8 +73,6 @@ client.on("ready", async () => {
         // Load commands
         client.commands = await commandLoader.load(`${__dirname}/commands`);
 
-        console.log(client.commands);
-
         // Start db interval if none is active
         if (!dbInterval) dbInterval = startDBInterval();
 
