@@ -47,7 +47,19 @@ function startDBInterval(): NodeJS.Timeout {
                                 user.expireAt = undefined;
                                 guilds[i].users[j] = user;
                                 await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
+                            } else {
+                                // User not in server anymore
+                                // This will set it to unlimited time so the moderators will have to remove the role manually
+                                // Or mute the user again with a new expiration date
+                                user.expireAt = undefined;
+                                await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
                             }
+                        } else {
+                            logger.warn("INTERVAL", "Guild not found");
+                            // Bot not in server anymore, not sure what to do here
+                            // 1. Remove server from database
+                            // 2. Presist server data for x amount of time
+                            // Maybe something else but idk at the moment
                         }
                     }
                 }
