@@ -47,38 +47,38 @@ export class MessageCollector extends EventEmitter {
 }
 
 /** Capitalize the first letter of a string */
-String.prototype.capitalize = function(): string { // eslint-disable-line no-extend-native
+String.prototype.capitalize = function (): string { // eslint-disable-line no-extend-native
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
 /** Paginate over an array */
-Array.prototype.paginate = function<T>(pageSize: number, pageNumber: number): T[] { // eslint-disable-line no-extend-native
+Array.prototype.paginate = function <T>(pageSize: number, pageNumber: number): T[] { // eslint-disable-line no-extend-native
     --pageNumber;
     return this.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
 };
 
-Array.prototype.remove = function<T>(item: T): T[] {
+Array.prototype.remove = function <T>(item: T): T[] { // eslint-disable-line no-extend-native
     for (let i = 0; i < this.length; i++) {
         if (this[i] === item)
             this.splice(i, 1);
-     }
-     return this;
+    }
+    return this;
 };
 
 /** Wait for a certain message/messages from a user */
-Channel.prototype.awaitMessages = function(filter: (message: Message) => boolean, options: IMessageCollectorOptions) {
+Channel.prototype.awaitMessages = function (filter: (message: Message) => boolean, options: IMessageCollectorOptions) {
     const collector = new MessageCollector(this as AnyChannel, filter, options);
     return new Promise((resolve) => collector.on("end", resolve));
 };
 
 Object.defineProperty(User.prototype, "tag", {
-    get: function() {
+    get: function () {
         return `${this.username}#${this.discriminator}`;
     }
 });
 
 Object.defineProperty(Member.prototype, "tag", {
-    get: function() {
+    get: function () {
         return `${this.username}#${this.discriminator}`;
     }
 });
