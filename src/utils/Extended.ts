@@ -52,9 +52,17 @@ String.prototype.capitalize = function(): string { // eslint-disable-line no-ext
 };
 
 /** Paginate over an array */
-Array.prototype.paginate = function(pageSize: number, pageNumber: number): any[] { // eslint-disable-line no-extend-native
+Array.prototype.paginate = function<T>(pageSize: number, pageNumber: number): T[] { // eslint-disable-line no-extend-native
     --pageNumber;
     return this.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
+};
+
+Array.prototype.remove = function<T>(item: T): T[] {
+    for (let i = 0; i < this.length; i++) {
+        if (this[i] === item)
+            this.splice(i, 1);
+     }
+     return this;
 };
 
 /** Wait for a certain message/messages from a user */

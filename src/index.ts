@@ -47,8 +47,8 @@ function startDBInterval(): NodeJS.Timeout {
                                 await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
                             } else {
                                 // User not in server anymore
-                                // This will set it to unlimited time so the moderators will have to remove the role manually
-                                // Or mute the user again with a new expiration date
+                                // This will set it to unlimited time, when the user joins the server again it will assign the mute role again
+                                // The moderators will have to remove the role manually or mute the user again with a new expiration date
                                 guilds[i].users[j].expireAt = undefined;
                                 await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
                             }

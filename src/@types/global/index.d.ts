@@ -6,5 +6,6 @@ declare global {
 
     interface Array<T> {
         paginate(pageSize: number, pageNumber: number): T[];
+        remove(item: T): T[];
     }
 }
