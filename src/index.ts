@@ -12,7 +12,7 @@ import { AnyChannel, AnyGuildChannel, Guild, Member } from "eris";
 import "./utils/Extended";
 
 let ready = false;
-let dbCheckInterval: NodeJS.Timeout | null = null;
+let dbInterval: NodeJS.Timeout | null = null;
 
 const client = new Mashu(settings.token, {
     getAllUsers: true,
@@ -56,23 +56,23 @@ client.on("ready", async () => {
         await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
         client.commands = await commandLoader.load(`${__dirname}/commands`);
 
-        if (!dbCheckInterval) dbCheckInterval = startDBInterval();
+        if (!dbInterval) dbInterval = startDBInterval();
 
         logger.ready(`Logged in as ${client.user.tag}`);
         logger.ready(`Loaded [${client.commands.size}] commands`);
 
         ready = true;
     } else {
-        if (!dbCheckInterval) dbCheckInterval = startDBInterval();
+        if (!dbInterval) dbInterval = startDBInterval();
         logger.ready("Client reconnected");
     }
 });
 
 client.on("disconnect", () => {
     logger.warn("DISCONNECT", "Client disconnected");
-    if (dbCheckInterval) {
-        clearInterval(dbCheckInterval);
-        dbCheckInterval = null;
+    if (dbInterval) {
+        clearInterval(dbInterval);
+        dbInterval = null;
     }
 });
 
@@ -135,9 +135,9 @@ process.on("unhandledRejection", (reason) => {
 });
 
 process.on("SIGINT", () => {
-    if (dbCheckInterval) {
-        clearInterval(dbCheckInterval);
-        dbCheckInterval = null;
+    if (dbInterval) {
+        clearInterval(dbInterval);
+        dbInterval = null;
     }
     client.disconnect({ reconnect: false });
     process.exit(0);
