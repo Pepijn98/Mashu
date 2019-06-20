@@ -34,24 +34,22 @@ function startDBInterval(): NodeJS.Timeout {
         const guilds = await GuildModel.find({}).exec();
         for (let i = 0; i < guilds.length; i++) {
             for (let j = 0; j < guilds[i].users.length; j++) {
-                const user = guilds[i].users[j];
-                if (user.expireAt) {
+                if (guilds[i].users[j].expireAt) {
                     const now = moment(Date.now()).utc().toDate();
-                    if (user.expireAt < now) {
+                    if (guilds[i].users[j].expireAt! < now) {
                         const guild = client.guilds.get(guilds[i].id);
                         if (guild) {
                             const guser = guild.members.get(guilds[i].users[j].id);
                             if (guser) {
                                 guser.removeRole(guilds[i].muteRole, "Mute reached expiration date");
-                                user.isMuted = false;
-                                user.expireAt = undefined;
-                                guilds[i].users[j] = user;
+                                guilds[i].users[j].isMuted = false;
+                                guilds[i].users[j].expireAt = undefined;
                                 await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
                             } else {
                                 // User not in server anymore
                                 // This will set it to unlimited time so the moderators will have to remove the role manually
                                 // Or mute the user again with a new expiration date
-                                user.expireAt = undefined;
+                                guilds[i].users[j].expireAt = undefined;
                                 await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
                             }
                         } else {
