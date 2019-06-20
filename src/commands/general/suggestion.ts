@@ -116,8 +116,9 @@ export default class Suggestion extends Command {
     public constructor(category: string) {
         super({
             name: "suggestion",
-            description: "",
-            usage: "",
+            description: "Create, show, list, accept and deny suggestions",
+            usage: "suggestion <action: string> [...rest: string[]]",
+            subCommands: ["create", "show", "list", "accept", "deny"],
             category: category,
             guildOnly: true,
             requiredArgs: 1,

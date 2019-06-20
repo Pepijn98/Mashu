@@ -12,6 +12,8 @@ export interface ICommandOptions {
     name: string;
     description: string;
     usage: string;
+    // example?: string | null;
+    subCommands?: string[] | null;
     category?: string | null;
     aliases?: string[] | null;
     hidden?: boolean | null;

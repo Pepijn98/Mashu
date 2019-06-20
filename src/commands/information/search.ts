@@ -9,7 +9,8 @@ export default class Search extends Command {
         super({
             name: "search",
             description: "Search for a user entry in the database",
-            usage: "search <bans|kicks|warns> <member: string|mention>",
+            usage: "search <subCommands: string> <member: string|mention>",
+            subCommands: ["bans", "kicks", "warns"],
             category: category,
             aliases: ["find"],
             guildOnly: true,

@@ -41,7 +41,7 @@ function startDBInterval(): NodeJS.Timeout {
                         if (guild) {
                             const guser = guild.members.get(guilds[i].users[j].id);
                             if (guser) {
-                                guser.removeRole(guilds[i].muteRole, "Mute reached expiration date");
+                                await guser.removeRole(guilds[i].muteRole, "Mute reached expiration date");
                                 guilds[i].users[j].isMuted = false;
                                 guilds[i].users[j].expireAt = undefined;
                                 await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();

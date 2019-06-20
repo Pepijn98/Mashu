@@ -9,7 +9,8 @@ export default class Remove extends Command {
         super({
             name: "remove",
             description: "Remove a violation from a user",
-            usage: "remove <warning|ban|kick> <id: string> <member: string|mention>",
+            usage: "remove <subCommand: string> <id: string> <member: string|mention>",
+            subCommands: ["warning", "ban", "kick"],
             category: category,
             guildOnly: true,
             requiredArgs: 3,
