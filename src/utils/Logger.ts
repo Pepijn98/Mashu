@@ -7,6 +7,7 @@ import {
     transports
 } from "winston";
 
+/** Custom logger, you know, this logs stuff to the terminal with pretty colors and timestamps :O */
 export default class Logger {
     private _log: WinstonLogger;
 

@@ -5,7 +5,7 @@ import { ICommandContext } from "./interfaces/ICommandContext";
 import { Message, Guild, AnyGuildChannel, Member } from "eris";
 
 export default abstract class Command {
-    public _key: string;
+    public _key: string; // Collection id
 
     public name: string;
     public description: string;
@@ -20,7 +20,7 @@ export default abstract class Command {
     public botPermissions: string[];
 
     public constructor(options: ICommandOptions) {
-        this._key = options.name; // Collection id
+        this._key = options.name;
 
         this.name = options.name;
         this.description = options.description;
@@ -35,6 +35,7 @@ export default abstract class Command {
         this.botPermissions = options.botPermissions || ["readMessages", "sendMessages"];
     }
 
+    /** Function with all the stuff the command needs to do */
     public abstract async run(msg: Message, args: string[], client: Mashu, context: ICommandContext): Promise<any>;
 
     /** Tries to find the user in the currently guild */
@@ -59,6 +60,7 @@ export default abstract class Command {
         return false;
     }
 
+    /** Generate violation ID, [ban, kick, warn, note] */
     public generateId(): string {
         return `_${Math.random().toString(36).substr(2, 9)}`;
     }

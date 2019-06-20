@@ -19,6 +19,7 @@ export default class Mashu extends Client {
         this.on("messageReactionRemove", this.onMessageReactionEvent);
     }
 
+    /** Handle reactions added/removed for a paginated message */
     public async onMessageReactionEvent(msg: Message, emoji: Emoji, userID: string): Promise<void> {
         if (!this.ready || userID === this.user.id || !(msg.content || msg.embeds || msg.attachments)) {
             return;
@@ -62,14 +63,15 @@ export default class Mashu extends Client {
         }
     }
 
+    /** Remove message from active messages */
     public async unwatchMessage(id: string, channelId: string): Promise<void> {
         Reflect.deleteProperty(this.activeMessages, id);
-
         if (channelId) {
             await this.removeMessageReactions(channelId, id);
         }
     }
 
+    /** Create a message with reaction buttons */
     public async reactionButtonMessage(
         msg: Message,
         messageQueue: string[],

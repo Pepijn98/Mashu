@@ -11,18 +11,23 @@ import { AnyChannel, AnyGuildChannel, Guild, Member } from "eris";
 
 import "./utils/Extended";
 
+// Whether the bot is ready or not
 let ready = false;
+// the DB interval
 let dbInterval: NodeJS.Timeout | null = null;
 
+// Initialize discord client
 const client = new Mashu(settings.token, {
     getAllUsers: true,
     restMode: true
 });
 
+// Initialize logger, command loader and command handler
 const logger = new Logger();
 const commandLoader = new CommandLoader(logger);
 const commandHandler = new CommandHandler({ settings, client, logger });
 
+/** Start the interval to check the db for expired mute dates */
 function startDBInterval(): NodeJS.Timeout {
     logger.info("INTERVAL", "Interval started");
     return setInterval(async () => {
@@ -53,9 +58,14 @@ function startDBInterval(): NodeJS.Timeout {
 
 client.on("ready", async () => {
     if (!ready) {
+        // Connect to mongodb
         await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
+        // Load commands
         client.commands = await commandLoader.load(`${__dirname}/commands`);
 
+        console.log(client.commands);
+
+        // Start db interval if none is active
         if (!dbInterval) dbInterval = startDBInterval();
 
         logger.ready(`Logged in as ${client.user.tag}`);
@@ -63,11 +73,13 @@ client.on("ready", async () => {
 
         ready = true;
     } else {
+        // Start db interval if none is active
         if (!dbInterval) dbInterval = startDBInterval();
         logger.ready("Client reconnected");
     }
 });
 
+// Handle disconnects
 client.on("disconnect", () => {
     logger.warn("DISCONNECT", "Client disconnected");
     if (dbInterval) {
@@ -81,6 +93,7 @@ client.on("messageCreate", async (msg) => {
     if (!msg.author) return; // Probably system message
     if (msg.author.discriminator === "0000") return; // Probably a webhook
 
+    // If message starts with our prefix check if it's a valid command, then execute the command if valid
     if (msg.content.startsWith(settings.prefix)) {
         if (isGuildChannel(msg.channel) && msg.author.id !== client.user.id) {
             await commandHandler.handleCommand(msg, false);
@@ -90,11 +103,13 @@ client.on("messageCreate", async (msg) => {
     }
 });
 
+// When the bot joins a new guild, create new model
 client.on("guildCreate", async (guild: Guild) => {
     const newGuild = new GuildModel({ "id": guild.id, "logChannel": "" });
     await newGuild.save();
 });
 
+// When new channel is created and the guild has a muted role, add the muted role
 client.on("channelCreate", async (channel: AnyChannel) => {
     if (isGuildChannel(channel)) {
         channel = channel as AnyGuildChannel;
@@ -105,6 +120,7 @@ client.on("channelCreate", async (channel: AnyChannel) => {
     }
 });
 
+// Handle muted members trying to re-join the server
 client.on("guildMemberAdd", async (guild: Guild, member: Member) => {
     const dbGuild = await GuildModel.findOne({ "id": guild.id }).exec();
     if (dbGuild && dbGuild.muteRole) {
@@ -143,4 +159,5 @@ process.on("SIGINT", () => {
     process.exit(0);
 });
 
+// Connect to discord OwO
 client.connect().catch((e) => logger.error("CONNECT", e.stack));

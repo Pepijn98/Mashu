@@ -3,6 +3,7 @@ import { isGuildChannel } from "./Helpers";
 import { EventEmitter } from "events";
 import { AnyChannel, Channel, User, Member, Message, Client, AnyGuildChannel } from "eris";
 
+/** A message collector for awaiting messages */
 export class MessageCollector extends EventEmitter {
     public filter: (message: Message) => boolean;
     public channel: AnyChannel;
@@ -45,18 +46,19 @@ export class MessageCollector extends EventEmitter {
     }
 }
 
-// eslint-disable-next-line no-extend-native
-String.prototype.capitalize = function(): string {
+/** Capitalize the first letter of a string */
+String.prototype.capitalize = function(): string { // eslint-disable-line no-extend-native
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
-// eslint-disable-next-line no-extend-native
-Array.prototype.paginate = function(pageSize: number, pageNumber: number): any[] {
+/** Paginate over an array */
+Array.prototype.paginate = function(pageSize: number, pageNumber: number): any[] { // eslint-disable-line no-extend-native
     --pageNumber;
     return this.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
 };
 
-Channel.prototype.awaitMessages = function(filter, options) {
+/** Wait for a certain message/messages from a user */
+Channel.prototype.awaitMessages = function(filter: (message: Message) => boolean, options: IMessageCollectorOptions) {
     const collector = new MessageCollector(this as AnyChannel, filter, options);
     return new Promise((resolve) => collector.on("end", resolve));
 };

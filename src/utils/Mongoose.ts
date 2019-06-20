@@ -1,6 +1,7 @@
 import { IViolation, INote, IUser, ISuggestion, IGuild } from "../interfaces/Guild";
 import { Document, Schema, Model, model } from "mongoose";
 
+// This includes bans, kicks and warns
 const Violation = new Schema<IViolation>({
     "id": String,
     "timestamp": String,
