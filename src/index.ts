@@ -67,7 +67,7 @@ function startDBInterval(): NodeJS.Timeout {
 }
 
 /** Check if we missed some new guilds while being offline */
-async function checkMissingGuilds() {
+async function checkMissingGuilds(): Promise<void> {
     // Get all guilds from db and map it to ids
     const guildIDs = (await GuildModel.find({}).exec()).map((g) => g.id);
 
