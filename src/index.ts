@@ -41,7 +41,7 @@ function startDBInterval(): NodeJS.Timeout {
                         if (guild) {
                             const guser = guild.members.get(guilds[i].users[j].id);
                             if (guser) {
-                                await guser.removeRole(guilds[i].muteRole, "Mute reached expiration date");
+                                await guser.removeRole(guilds[i].muteRole, "[UNMUTE] Mute reached expiration date");
                                 guilds[i].users[j].isMuted = false;
                                 guilds[i].users[j].expireAt = undefined;
                                 await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
@@ -66,19 +66,41 @@ function startDBInterval(): NodeJS.Timeout {
     }, 60000); // Every minute
 }
 
+/** Check if we missed some new guilds while being offline */
+async function checkMissingGuilds() {
+    // Get all guilds from db and map it to ids
+    const guildIDs = (await GuildModel.find({}).exec()).map((g) => g.id);
+
+    // Check all guilds the bot sees and verify if it's in the db
+    const missingGuilds = client.guilds.filter((g) => !guildIDs.includes(g.id));
+
+    // Add all the missing guilds to the db
+    for (let i = 0; i < missingGuilds.length; i++) {
+        const guild = missingGuilds[i];
+        const newGuild = new GuildModel({ "id": guild.id, "logChannel": "" });
+        await newGuild.save();
+    }
+}
+
 client.on("ready", async () => {
     if (!ready) {
         // Connect to mongodb
         await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
+
         // Load commands
         client.commands = await commandLoader.load(`${__dirname}/commands`);
 
         // Start db interval if none is active
         if (!dbInterval) dbInterval = startDBInterval();
 
+        // Check for missing guilds
+        await checkMissingGuilds();
+
+        // Log some info
         logger.ready(`Logged in as ${client.user.tag}`);
         logger.ready(`Loaded [${client.commands.size}] commands`);
 
+        // We're ready \o/
         ready = true;
     } else {
         // Start db interval if none is active

@@ -1,6 +1,6 @@
 {
     "name": "mashu",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Attempt to create a moderation bot",
     "engines": {
         "node": ">=8.0.0 <11.0.0",
