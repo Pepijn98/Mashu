@@ -12,6 +12,7 @@ import { AnyChannel, AnyGuildChannel, Guild, Member } from "eris";
 import "./utils/Extended";
 
 let ready = false;
+let dbCheckInterval: NodeJS.Timeout | null = null;
 
 const client = new Mashu(settings.token, {
     getAllUsers: true,
@@ -22,43 +23,57 @@ const logger = new Logger();
 const commandLoader = new CommandLoader(logger);
 const commandHandler = new CommandHandler({ settings, client, logger });
 
-client.on("ready", async () => {
-    if (!ready) {
-        await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
-        client.commands = await commandLoader.load(`${__dirname}/commands`);
-
-        setInterval(async () => {
-            const guilds = await GuildModel.find({}).exec();
-            for (let i = 0; i < guilds.length; i++) {
-                for (let j = 0; j < guilds[i].users.length; j++) {
-                    const user = guilds[i].users[j];
-                    if (user.expireAt) {
-                        const now = moment(Date.now()).utc().toDate();
-                        if (user.expireAt < now) {
-                            const guild = client.guilds.get(guilds[i].id);
-                            if (guild) {
-                                const guser = guild.members.get(guilds[i].users[j].id);
-                                if (guser) {
-                                    guser.removeRole(guilds[i].muteRole, "Mute reached expiration date");
-                                    user.isMuted = false;
-                                    user.expireAt = undefined;
-                                    guilds[i].users[j] = user;
-                                    await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
-                                }
+function startDBInterval(): NodeJS.Timeout {
+    logger.info("INTERVAL", "Interval started");
+    return setInterval(async () => {
+        const guilds = await GuildModel.find({}).exec();
+        for (let i = 0; i < guilds.length; i++) {
+            for (let j = 0; j < guilds[i].users.length; j++) {
+                const user = guilds[i].users[j];
+                if (user.expireAt) {
+                    const now = moment(Date.now()).utc().toDate();
+                    if (user.expireAt < now) {
+                        const guild = client.guilds.get(guilds[i].id);
+                        if (guild) {
+                            const guser = guild.members.get(guilds[i].users[j].id);
+                            if (guser) {
+                                guser.removeRole(guilds[i].muteRole, "Mute reached expiration date");
+                                user.isMuted = false;
+                                user.expireAt = undefined;
+                                guilds[i].users[j] = user;
+                                await GuildModel.updateOne({ "id": guilds[i].id }, guilds[i]).exec();
                             }
                         }
                     }
                 }
             }
-        }, 60000); // Every minute
+        }
+    }, 60000); // Every minute
+}
+
+client.on("ready", async () => {
+    if (!ready) {
+        await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
+        client.commands = await commandLoader.load(`${__dirname}/commands`);
+
+        if (!dbCheckInterval) dbCheckInterval = startDBInterval();
 
         logger.ready(`Logged in as ${client.user.tag}`);
         logger.ready(`Loaded [${client.commands.size}] commands`);
-    } else {
-        logger.ready("Reconnected");
-    }
 
-    ready = true;
+        ready = true;
+    } else {
+        if (!dbCheckInterval) dbCheckInterval = startDBInterval();
+        logger.ready("Client reconnected");
+    }
+});
+
+client.on("disconnect", () => {
+    logger.warn("DISCONNECT", "Client disconnected");
+    if (dbCheckInterval) {
+        clearInterval(dbCheckInterval);
+        dbCheckInterval = null;
+    }
 });
 
 client.on("messageCreate", async (msg) => {
@@ -115,7 +130,15 @@ client.on("guildMemberAdd", async (guild: Guild, member: Member) => {
     }
 });
 
+process.on("unhandledRejection", (reason) => {
+    logger.error("UNHANDLED_REJECTION", reason);
+});
+
 process.on("SIGINT", () => {
+    if (dbCheckInterval) {
+        clearInterval(dbCheckInterval);
+        dbCheckInterval = null;
+    }
     client.disconnect({ reconnect: false });
     process.exit(0);
 });
