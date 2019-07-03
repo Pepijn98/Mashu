@@ -1,6 +1,8 @@
 # Mashu
 Attempt to create a moderation bot
 
+[invite me](https://discordapp.com/oauth2/authorize?client_id=419642001424646145&scope=bot&permissions=268823678)
+
 ## Commands
 | Command | Description | Category |
 | ------- | ----------- | -------- |
