@@ -16,14 +16,14 @@ export default class Eval extends Command {
         });
     }
 
-    public async run(msg: Message, _args: string[], _client: Mashu, ctx: ICommandContext): Promise<void> {
+    public async run(msg: Message, args: string[], client: Mashu, ctx: ICommandContext): Promise<void> {
         ctx.logger.info("EVAL", `${msg.author.username}: ${msg.content}`);
 
         let toEval = msg.content.replace(`${ctx.settings.prefix}eval`, "").trim();
         let result = "~eval failed~";
         try {
             result = await eval(toEval);
-            result = result ? result.toString().replace(new RegExp(`${ctx.settings.token}`, "giu"), "<token-redacted>") : "Empty Result";
+            result = result ? result.toString().replace(new RegExp(ctx.settings.token, "giu"), "<token-redacted>") : "Empty Result";
         } catch (error) {
             ctx.logger.info("EVAL FAILED", `${error.toString()}`);
             msg.channel.createMessage(`\`\`\`diff\n- ${error}\`\`\``);
