@@ -1,7 +1,7 @@
 # Mashu
 Attempt to create a moderation bot
 
-[invite me](https://discordapp.com/oauth2/authorize?client_id=419642001424646145&scope=bot&permissions=268823678)
+[invite me](https://discordapp.com/oauth2/authorize?client_id=419642001424646145&scope=bot&permissions=268823678&redirect_uri=https%3A%2F%2Fmashu.xyz%3Fredirect%3Ddiscordapp)
 
 ## Commands
 | Command | Description | Category |
