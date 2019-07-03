@@ -10,6 +10,7 @@ export default class Setup extends Command {
             name: "setup",
             description: "Setup some basic moderation info",
             usage: "setup",
+            example: "setup",
             category: category,
             guildOnly: true,
             userPermissions: ["sendMessages", "manageGuild"]

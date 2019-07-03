@@ -10,6 +10,7 @@ export default class Mute extends Command {
             name: "unmute",
             description: "Unmute a user in the current guild",
             usage: "unmute <member: string|mention> [reason: string]",
+            example: "unmute Kurozero Has been muted for long enough",
             category: category,
             guildOnly: true,
             requiredArgs: 2,

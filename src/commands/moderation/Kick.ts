@@ -10,6 +10,7 @@ export default class Kick extends Command {
             name: "kick",
             description: "Kick a user from the current guild",
             usage: "kick <member: string|mention> [reason: string]",
+            example: "kick Kurozero",
             category: category,
             guildOnly: true,
             requiredArgs: 2,

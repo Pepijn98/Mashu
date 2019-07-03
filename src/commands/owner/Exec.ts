@@ -8,6 +8,7 @@ export default class Exec extends Command {
             name: "exec",
             description: "Execute shell shit",
             usage: "exec <command: string>",
+            example: "exec pm2 list",
             category: category,
             ownerOnly: true,
             requiredArgs: 1

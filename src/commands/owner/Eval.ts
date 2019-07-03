@@ -9,6 +9,7 @@ export default class Eval extends Command {
             name: "eval",
             description: "Evaluate javascript code",
             usage: "eval <code: string>",
+            example: "eval 1 + 1",
             category: category,
             ownerOnly: true,
             requiredArgs: 1

@@ -10,6 +10,7 @@ export default class Search extends Command {
             name: "search",
             description: "Search for a user entry in the database",
             usage: "search <subCommands: string> <member: string|mention>",
+            example: "search bans Kurozero",
             subCommands: ["bans", "kicks", "warns"],
             category: category,
             aliases: ["find"],

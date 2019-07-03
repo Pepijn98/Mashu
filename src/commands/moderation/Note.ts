@@ -13,6 +13,7 @@ export default class Note extends Command {
                 "= Add + or - in front of a message to mark it either positive or negative =\n" +
                 "= All available actions are add, remove, update and view",
             usage: "note <action: string> <member: string|mention> <message: string>",
+            example: "note add Kurozero +Adding a positive note",
             subCommands: ["add", "remove", "update", "view"],
             category: category,
             guildOnly: true,

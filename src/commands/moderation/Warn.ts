@@ -10,6 +10,7 @@ export default class Warn extends Command {
             name: "warn",
             description: "Warn a user from the current guild",
             usage: "warn <member: string|mention> [reason: string]",
+            example: "warn Kurozero Posting bad messages",
             category: category,
             guildOnly: true,
             requiredArgs: 2,

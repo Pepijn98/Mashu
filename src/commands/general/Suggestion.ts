@@ -118,6 +118,7 @@ export default class Suggestion extends Command {
             name: "suggestion",
             description: "Create, show, list, accept and deny suggestions",
             usage: "suggestion <action: string> [...rest: string[]]",
+            example: "suggestion create This is a new suggestion, I like to have more cargirls",
             subCommands: ["create", "show", "list", "accept", "deny"],
             category: category,
             guildOnly: true,

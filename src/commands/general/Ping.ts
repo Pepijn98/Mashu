@@ -7,6 +7,7 @@ export default class Ping extends Command {
             name: "ping",
             description: "Testing the bot",
             usage: "ping",
+            example: "ping",
             category: category
         });
     }

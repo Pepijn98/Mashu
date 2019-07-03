@@ -10,6 +10,7 @@ export default class Profile extends Command {
             name: "profile",
             description: "View your or someone else's profile",
             usage: "profile [member: string|mention]",
+            example: "profile Kurozero",
             category: category,
             guildOnly: true
         });

@@ -10,6 +10,7 @@ export default class Unban extends Command {
             name: "unban",
             description: "Unban a user from the current guild",
             usage: "unban <member: string> [reason: string]",
+            example: "unban Kurozero Has been banned for long enough",
             category: category,
             guildOnly: true,
             requiredArgs: 2,

@@ -8,8 +8,9 @@ export default class Remove extends Command {
     public constructor(category: string) {
         super({
             name: "remove",
-            description: "Remove a violation from a user",
+            description: "Remove a violation from a user = \n = (this does not actually unban the member use `unban` for that)",
             usage: "remove <subCommand: string> <id: string> <member: string|mention>",
+            example: "remove warning 5 Kurozero",
             subCommands: ["warning", "ban", "kick"],
             category: category,
             guildOnly: true,

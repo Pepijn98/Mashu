@@ -11,6 +11,7 @@ export default class Mute extends Command {
             name: "mute",
             description: "Mute a user in the current guild",
             usage: "mute <member: string|mention> <expires: timeString | never> [reason: string]",
+            example: "mute Kurozero never Because I can",
             category: category,
             guildOnly: true,
             requiredArgs: 2,

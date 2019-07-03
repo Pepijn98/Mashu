@@ -9,6 +9,7 @@ export default class Help extends Command {
             name: "help",
             description: "send info about the commands",
             usage: "help [command: string]",
+            example: "help ping",
             category: category
         });
     }
@@ -54,6 +55,7 @@ export default class Help extends Command {
                 `Category           ::  ${command.category}\n` +
                 `Aliases            ::  ${command.aliases.join(", ")}\n` +
                 `Usage              ::  ${ctx.settings.prefix}${command.usage}\n` +
+                `Example            ::  ${command.example}\n` +
                 `Sub Commands       ::  ${command.subCommands.join(", ")}\n` +
                 `Hidden             ::  ${command.hidden ? "yes" : "no"}\n` +
                 `Guild Only         ::  ${command.guildOnly ? "yes" : "no"}\n` +

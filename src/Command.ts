@@ -10,6 +10,7 @@ export default abstract class Command {
     public name: string;
     public description: string;
     public usage: string;
+    public example: string;
     public subCommands: string[];
     public category: string;
     public aliases: string[];
@@ -26,6 +27,7 @@ export default abstract class Command {
         this.name = options.name;
         this.description = options.description;
         this.usage = options.usage;
+        this.example = options.example;
         this.subCommands = options.subCommands || [];
         this.category = options.category || "general";
         this.aliases = options.aliases || [];

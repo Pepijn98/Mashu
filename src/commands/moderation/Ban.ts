@@ -10,6 +10,7 @@ export default class Ban extends Command {
             name: "ban",
             description: "Ban a user from the current guild",
             usage: "ban <member: string|mention> [reason: string]",
+            example: "ban Kurozero Has been a bad boy >:(",
             category: category,
             guildOnly: true,
             requiredArgs: 2,
