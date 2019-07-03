@@ -20,3 +20,6 @@ Attempt to create a moderation bot
 | `warn` | Warn a user from the current guild | Moderation |
 | `eval` | Evaluate javascript code | Owner |
 | `exec` | Execute shell shit | Owner |
+
+## Support
+![discord](https://discordapp.com/api/v6/guilds/240059867744698368/widget.png?style=banner2)
