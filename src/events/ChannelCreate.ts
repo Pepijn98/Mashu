@@ -1,4 +1,4 @@
-import { GuildModel } from "../utils/Mongoose";
+import { GuildModel } from "../structures/Mongoose";
 import { IEvent } from "../interfaces/IEvent";
 import { isGuildChannel } from "../utils/Helpers";
 import { AnyChannel, AnyGuildChannel } from "eris";

@@ -1,5 +1,5 @@
-import Mashu from "../utils/MashuClient";
-import { GuildModel, IGuildModel } from "../utils/Mongoose";
+import Mashu from "../structures/MashuClient";
+import { GuildModel, IGuildModel } from "../structures/Mongoose";
 import { ISuggestion } from "../interfaces/Guild";
 import { User } from "eris";
 

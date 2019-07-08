@@ -1,5 +1,5 @@
 import Command from "../../Command";
-import Mashu from "../../utils/MashuClient";
+import Mashu from "../../structures/MashuClient";
 import { Message } from "eris";
 import { ICommandContext } from "../../interfaces/ICommandContext";
 

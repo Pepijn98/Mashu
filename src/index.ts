@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import moment from "moment";
 import settings from "../settings";
-import Mashu from "./utils/MashuClient";
-import CommandHandler from "./utils/CommandHandler";
-import CommandLoader from "./utils/CommandLoader";
+import Mashu from "./structures/MashuClient";
+import CommandHandler from "./structures/CommandHandler";
+import CommandLoader from "./structures/CommandLoader";
 import Logger from "./utils/Logger";
 import { promises as fs } from "fs";
-import { GuildModel } from "./utils/Mongoose";
+import { GuildModel } from "./structures/Mongoose";
 import { isGuildChannel } from "./utils/Helpers";
 
 import "./utils/Extended";
@@ -129,6 +129,8 @@ async function main(): Promise<void> {
         if (!ready) return; // Bot not ready yet
         if (!msg.author) return; // Probably system message
         if (msg.author.discriminator === "0000") return; // Probably a webhook
+
+        client.stats.messagesSeen++;
 
         // If message starts with our prefix check if it's a valid command, then execute the command if valid
         if (msg.content.startsWith(settings.prefix)) {

@@ -1,6 +1,6 @@
 import SuggestionController from "../../controller/SuggestionController";
 import Command from "../../Command";
-import Mashu from "../../utils/MashuClient";
+import Mashu from "../../structures/MashuClient";
 import { ISuggestion } from "../../interfaces/Guild";
 import { IDatabaseContext, ICommandContext } from "../../interfaces/ICommandContext";
 import { isGuildChannel } from "../../utils/Helpers";

@@ -1,6 +1,7 @@
 import Collection from "@kurozero/collection";
 import Command from "../Command";
-import { isGuildChannel } from "./Helpers";
+import { isGuildChannel } from "../utils/Helpers";
+import { ICommandStats } from "../interfaces/Options";
 import { IActiveMessage, IReactionButton } from "../interfaces/IActiveMessage";
 import { Client, Message, Emoji, ClientOptions, AnyGuildChannel } from "eris";
 
@@ -8,12 +9,18 @@ export default class Mashu extends Client {
     public commands: Collection<Command>;
     public activeMessages: Record<string|number|symbol, IActiveMessage>; // TODO: Maybe use a Collection for this
     public ready: boolean = false;
+    public stats: ICommandStats;
 
     public constructor(token: string, options: ClientOptions) {
         super(token, options);
 
         this.commands = new Collection(Command);
         this.activeMessages = {};
+        this.stats = {
+            commandsExecuted: 0,
+            messagesSeen: 0,
+            commandUsage: {}
+        };
 
         this.on("messageReactionAdd", this.onMessageReactionEvent);
         this.on("messageReactionRemove", this.onMessageReactionEvent);

@@ -1,4 +1,4 @@
-import { GuildModel } from "../utils/Mongoose";
+import { GuildModel } from "../structures/Mongoose";
 import { Guild, Member } from "eris";
 import { IEvent } from "../interfaces/IEvent";
 

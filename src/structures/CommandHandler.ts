@@ -1,10 +1,11 @@
 import Mashu from "./MashuClient";
-import Logger from "./Logger";
+import Logger from "../utils/Logger";
 import { GuildModel } from "./Mongoose";
 import { ISettings } from "../interfaces/ISettings";
 import { ICommandHandlerOptions } from "../interfaces/Options";
-import { isGuildChannel } from "./Helpers";
-import { Message, AnyGuildChannel } from "eris";
+import { isGuildChannel } from "../utils/Helpers";
+import { Message, AnyGuildChannel, User } from "eris";
+import { Collection } from "@kurozero/collection";
 
 export default class CommandHandler {
     public settings: ISettings;
@@ -23,6 +24,11 @@ export default class CommandHandler {
 
         const command = this.client.commands.find((cmd) => cmd.name === name || cmd.aliases.indexOf(name) !== -1);
         if (!command) return false; // Command doesn't exist
+
+        this.client.stats.commandsExecuted++;
+        this.client.stats.commandUsage[name] = this.client.stats.commandUsage[name] ? this.client.stats.commandUsage[name] : { size: 0, users: new Collection<User>(User) };
+        this.client.stats.commandUsage[name].size++;
+        this.client.stats.commandUsage[name].users.set(msg.author.id, msg.author);
 
         const args = parts.splice(1);
         const context = {
@@ -103,6 +109,7 @@ export default class CommandHandler {
             await command.run(msg, args, this.client, context);
             return true;
         } catch (error) {
+            console.error(error);
             try {
                 await msg.channel.createMessage({
                     embed: {

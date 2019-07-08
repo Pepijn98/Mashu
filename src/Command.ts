@@ -1,4 +1,4 @@
-import Mashu from "./utils/MashuClient";
+import Mashu from "./structures/MashuClient";
 import { ICommandOptions } from "./interfaces/Options";
 import { isGuildChannel } from "./utils/Helpers";
 import { ICommandContext } from "./interfaces/ICommandContext";

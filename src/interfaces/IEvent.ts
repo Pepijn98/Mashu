@@ -1,4 +1,4 @@
-import Mashu from "../utils/MashuClient";
+import Mashu from "../structures/MashuClient";
 import { ISettings } from "../interfaces/ISettings";
 
 export interface IEvent {

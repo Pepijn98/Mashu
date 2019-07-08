@@ -1,5 +1,5 @@
 import Command from "../Command";
-import Logger from "./Logger";
+import Logger from "../utils/Logger";
 import Collection from "@kurozero/collection";
 import { promises as fs } from "fs";
 

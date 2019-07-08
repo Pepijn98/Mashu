@@ -1,6 +1,8 @@
-import Mashu from "../utils/MashuClient";
+import Mashu from "../structures/MashuClient";
 import Logger from "../utils/Logger";
 import { ISettings } from "./ISettings";
+import { User } from "eris";
+import Collection from "@kurozero/collection";
 
 export interface ICommandHandlerOptions {
     settings: ISettings;
@@ -27,4 +29,15 @@ export interface ICommandOptions {
 export interface IMessageCollectorOptions {
     time: number;
     maxMatches: number;
+}
+
+export interface ICommandStats {
+    commandsExecuted: number;
+    messagesSeen: number;
+    commandUsage: {
+        [x: string]: {
+            size: number;
+            users: Collection<User>;
+        };
+    };
 }

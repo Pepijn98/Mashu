@@ -1,5 +1,5 @@
 import Command from "../../Command";
-import Mashu from "../../utils/MashuClient";
+import Mashu from "../../structures/MashuClient";
 import { ICommandContext, IDatabaseContext } from "../../interfaces/ICommandContext";
 import { isGuildChannel, sleep } from "../../utils/Helpers";
 import { Message, AnyGuildChannel } from "eris";
