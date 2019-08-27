@@ -36,7 +36,7 @@
         "lint:fix": "eslint --ext .ts --fix ."
     },
     "dependencies": {
-        "@kurozero/collection": "^0.4.1",
+        "@kurozero/collection": "^0.4.5",
         "bluebird": "^3.5.5",
         "bufferutil": "^4.0.1",
         "chalk": "^2.4.2",
@@ -44,21 +44,21 @@
         "eris": "^0.10.1",
         "erlpack": "abalabahaha/erlpack",
         "moment": "^2.24.0",
-        "mongoose": "^5.6.9",
+        "mongoose": "^5.6.11",
         "os-utils": "oscmejia/os-utils",
         "winston": "^3.2.1",
         "zlib-sync": "^0.1.5"
     },
     "devDependencies": {
-        "@types/mongoose": "^5.5.12",
-        "@types/node": "^12.7.1",
-        "@typescript-eslint/eslint-plugin": "^1.13.0",
-        "@typescript-eslint/parser": "^1.13.0",
-        "eslint": "^6.1.0",
+        "@types/mongoose": "^5.5.13",
+        "@types/node": "^12.7.2",
+        "@typescript-eslint/eslint-plugin": "^2.0.0",
+        "@typescript-eslint/parser": "^2.0.0",
+        "eslint": "^6.2.2",
         "gts": "^1.1.0",
         "ts-node": "^8.3.0",
         "tsconfig-paths": "^3.8.0",
-        "tslint": "^5.18.0",
+        "tslint": "^5.19.0",
         "typescript": "^3.5.3"
     }
 }
