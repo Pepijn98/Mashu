@@ -84,7 +84,7 @@ async function checkMissingGuilds(): Promise<void> {
 client.on("ready", async () => {
     if (!ready) {
         // Connect to mongodb
-        await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
+        await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true, useUnifiedTopology: true } as any);
         // Load commands
         client.commands = await commandLoader.load(`${__dirname}/commands`);
         // Start db interval if none is active

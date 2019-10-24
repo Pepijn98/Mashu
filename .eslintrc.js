@@ -20,6 +20,7 @@ module.exports = {
         "@typescript-eslint/interface-name-prefix": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/triple-slash-reference": "off",
         "accessor-pairs": "error",
         "array-bracket-newline": "error",
         "array-bracket-spacing": [
@@ -318,10 +319,7 @@ module.exports = {
                 "words": true
             }
         ],
-        "spaced-comment": [
-            "error",
-            "always"
-        ],
+        "spaced-comment": "off",
         "strict": "error",
         "switch-colon-spacing": "error",
         "symbol-description": "error",
