@@ -38,7 +38,6 @@ const SuggestionSchema = new Schema<ISuggestion>({
     "notificationId": String
 });
 
-// @ts-ignore
 export interface IGuildModel extends IGuild, Document {}
 
 const GuildSchema = new Schema<IGuildModel>({

@@ -7,7 +7,7 @@ import { Client, Message, Emoji, ClientOptions, AnyGuildChannel } from "eris";
 export default class Mashu extends Client {
     public commands: Collection<Command>;
     public activeMessages: Record<string|number|symbol, IActiveMessage>; // TODO: Maybe use a Collection for this
-    public ready: boolean = false;
+    public ready = false;
     public stats: ICommandStats;
 
     public constructor(token: string, options: ClientOptions) {

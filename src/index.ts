@@ -81,6 +81,68 @@ async function checkMissingGuilds(): Promise<void> {
     }
 }
 
+client.on("ready", async () => {
+    if (!ready) {
+        // Connect to mongodb
+        await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
+        // Load commands
+        client.commands = await commandLoader.load(`${__dirname}/commands`);
+        // Start db interval if none is active
+        if (!dbInterval) dbInterval = startDBInterval();
+        // Check for missing guilds
+        await checkMissingGuilds();
+        // Log some info
+        logger.ready(`Logged in as ${client.user.tag}`);
+        logger.ready(`Loaded [${client.commands.size}] commands`);
+        // We're ready \o/
+        ready = true; // eslint-disable-line require-atomic-updates
+    } else {
+        // Start db interval if none is active
+        if (!dbInterval) dbInterval = startDBInterval();
+        logger.ready("Client reconnected");
+    }
+});
+
+// Handle disconnects
+client.on("disconnect", () => {
+    logger.warn("DISCONNECT", "Client disconnected");
+    if (dbInterval) {
+        clearInterval(dbInterval);
+        dbInterval = null;
+    }
+});
+
+// Handle commands
+client.on("messageCreate", async (msg) => {
+    if (!ready) return; // Bot not ready yet
+    if (!msg.author) return; // Probably system message
+    if (msg.author.discriminator === "0000") return; // Probably a webhook
+
+    client.stats.messagesSeen++;
+
+    // If message starts with our prefix check if it's a valid command, then execute the command if valid
+    if (msg.content.startsWith(settings.prefix)) {
+        if (msg.channel.isGuildChannel && msg.author.id !== client.user.id) {
+            await commandHandler.handleCommand(msg, false);
+        } else if (msg.channel.type === 1) {
+            await commandHandler.handleCommand(msg, true);
+        }
+    }
+});
+
+process.on("unhandledRejection", (reason) => {
+    logger.error("UNHANDLED_REJECTION", reason);
+});
+
+process.on("SIGINT", () => {
+    if (dbInterval) {
+        clearInterval(dbInterval);
+        dbInterval = null;
+    }
+    client.disconnect({ reconnect: false });
+    process.exit(0);
+});
+
 async function main(): Promise<void> {
     const eventsDir = `${__dirname}/events`;
     const files = await fs.readdir(eventsDir);
@@ -91,68 +153,6 @@ async function main(): Promise<void> {
             client.on(temp.event.name, (...args) => temp.event.run(client, settings, args));
         }
     }
-
-    client.on("ready", async () => {
-        if (!ready) {
-            // Connect to mongodb
-            await mongoose.connect(`mongodb://${settings.database.host}:${settings.database.port}/${settings.database.name}`, { useNewUrlParser: true });
-            // Load commands
-            client.commands = await commandLoader.load(`${__dirname}/commands`);
-            // Start db interval if none is active
-            if (!dbInterval) dbInterval = startDBInterval();
-            // Check for missing guilds
-            await checkMissingGuilds();
-            // Log some info
-            logger.ready(`Logged in as ${client.user.tag}`);
-            logger.ready(`Loaded [${client.commands.size}] commands`);
-            // We're ready \o/
-            ready = true;
-        } else {
-            // Start db interval if none is active
-            if (!dbInterval) dbInterval = startDBInterval();
-            logger.ready("Client reconnected");
-        }
-    });
-
-    // Handle disconnects
-    client.on("disconnect", () => {
-        logger.warn("DISCONNECT", "Client disconnected");
-        if (dbInterval) {
-            clearInterval(dbInterval);
-            dbInterval = null;
-        }
-    });
-
-    // Handle commands
-    client.on("messageCreate", async (msg) => {
-        if (!ready) return; // Bot not ready yet
-        if (!msg.author) return; // Probably system message
-        if (msg.author.discriminator === "0000") return; // Probably a webhook
-
-        client.stats.messagesSeen++;
-
-        // If message starts with our prefix check if it's a valid command, then execute the command if valid
-        if (msg.content.startsWith(settings.prefix)) {
-            if (msg.channel.isGuildChannel && msg.author.id !== client.user.id) {
-                await commandHandler.handleCommand(msg, false);
-            } else if (msg.channel.type === 1) {
-                await commandHandler.handleCommand(msg, true);
-            }
-        }
-    });
-
-    process.on("unhandledRejection", (reason) => {
-        logger.error("UNHANDLED_REJECTION", reason);
-    });
-
-    process.on("SIGINT", () => {
-        if (dbInterval) {
-            clearInterval(dbInterval);
-            dbInterval = null;
-        }
-        client.disconnect({ reconnect: false });
-        process.exit(0);
-    });
 
     // Connect to discord OwO
     client.connect().catch((e) => logger.error("CONNECT", e.stack));

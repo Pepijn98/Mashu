@@ -36,29 +36,29 @@
         "lint:fix": "eslint --ext .ts --fix ."
     },
     "dependencies": {
-        "@kurozero/collection": "^0.4.5",
-        "bluebird": "^3.5.5",
+        "@kurozero/collection": "^0.4.8",
+        "bluebird": "^3.7.1",
         "bufferutil": "^4.0.1",
         "chalk": "^2.4.2",
-        "cross-env": "^5.2.0",
-        "eris": "^0.10.1",
+        "cross-env": "^6.0.3",
+        "eris": "^0.11.0",
         "erlpack": "abalabahaha/erlpack",
         "moment": "^2.24.0",
-        "mongoose": "^5.6.11",
+        "mongoose": "^5.7.7",
         "os-utils": "oscmejia/os-utils",
         "winston": "^3.2.1",
         "zlib-sync": "^0.1.5"
     },
     "devDependencies": {
-        "@types/mongoose": "^5.5.13",
-        "@types/node": "^12.7.2",
-        "@typescript-eslint/eslint-plugin": "^2.0.0",
-        "@typescript-eslint/parser": "^2.0.0",
-        "eslint": "^6.2.2",
+        "@types/mongoose": "^5.5.23",
+        "@types/node": "^12.11.7",
+        "@typescript-eslint/eslint-plugin": "^2.5.0",
+        "@typescript-eslint/parser": "^2.5.0",
+        "eslint": "^6.5.1",
         "gts": "^1.1.0",
-        "ts-node": "^8.3.0",
-        "tsconfig-paths": "^3.8.0",
-        "tslint": "^5.19.0",
-        "typescript": "^3.5.3"
+        "ts-node": "^8.4.1",
+        "tsconfig-paths": "^3.9.0",
+        "tslint": "^5.20.0",
+        "typescript": "^3.6.4"
     }
 }
