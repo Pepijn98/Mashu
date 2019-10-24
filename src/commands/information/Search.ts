@@ -1,7 +1,6 @@
 import Command from "../../Command";
 import Mashu from "../../structures/MashuClient";
 import { ICommandContext } from "../../interfaces/ICommandContext";
-import { isGuildChannel } from "../../utils/Helpers";
 import { Message, AnyGuildChannel } from "eris";
 
 export default class Search extends Command {
@@ -20,7 +19,7 @@ export default class Search extends Command {
     }
 
     public async run(msg: Message, args: string[], _client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         const member = this.findMember(msg, args[1]);

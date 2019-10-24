@@ -1,5 +1,4 @@
 import { IMessageCollectorOptions } from "src/interfaces/Options";
-import { isGuildChannel } from "./Helpers";
 import { EventEmitter } from "events";
 import { AnyChannel, Channel, User, Member, Message, Client, AnyGuildChannel } from "eris";
 
@@ -20,7 +19,7 @@ export class MessageCollector extends EventEmitter {
         this.options = options || {};
         this.ended = false;
         this.collected = [];
-        this.bot = isGuildChannel(channel) && (channel as AnyGuildChannel).guild ? (channel as AnyGuildChannel).guild.shard.client : (channel as any)._client;
+        this.bot = channel.isGuildChannel && (channel as AnyGuildChannel).guild ? (channel as AnyGuildChannel).guild.shard.client : (channel as any)._client;
 
         this.listener = (message) => this.verify(message);
         this.bot.on("messageCreate", this.listener);
@@ -70,6 +69,28 @@ Channel.prototype.awaitMessages = function (filter: (message: Message) => boolea
     const collector = new MessageCollector(this as AnyChannel, filter, options);
     return new Promise((resolve) => collector.on("end", resolve));
 };
+
+Object.defineProperty(Channel.prototype, "isGuildChannel", {
+    get: function () {
+        switch (this.type) {
+            case 0: return true; // TextChannel
+            case 2: return true; // VoiceChannel
+            case 4: return true; // CategoryChannel
+            case 5: return true; // NewsChannel
+            case 6: return true; // StoreChannel
+            default: return false;
+        }
+    }
+});
+
+Object.defineProperty(Channel.prototype, "isDMChannel", {
+    get: function () {
+        switch (this.type) {
+            case 1: return true;
+            default: return false;
+        }
+    }
+});
 
 Object.defineProperty(User.prototype, "tag", {
     get: function () {

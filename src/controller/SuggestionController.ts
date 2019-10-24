@@ -9,7 +9,7 @@ export default class SuggestionController {
         const guild = await GuildModel.findOne({ "id": guildId }).exec();
 
         if (guild) {
-            const currentAmount = await guild.suggestions.length;
+            const currentAmount = guild.suggestions.length;
             const suggestion: ISuggestion = {
                 id: currentAmount + 1,
                 creator: `${creator.username}#${creator.discriminator}`,

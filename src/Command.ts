@@ -1,6 +1,5 @@
 import Mashu from "./structures/MashuClient";
 import { ICommandOptions } from "./interfaces/Options";
-import { isGuildChannel } from "./utils/Helpers";
 import { ICommandContext } from "./interfaces/ICommandContext";
 import { Message, Guild, AnyGuildChannel, Member } from "eris";
 
@@ -47,7 +46,7 @@ export default abstract class Command {
         if (!str || str === "") return false;
 
         let guild: Guild | null = null;
-        if (isGuildChannel(msg.channel))
+        if (msg.channel.isGuildChannel)
             guild = (msg.channel as AnyGuildChannel).guild;
 
         if (!guild) return false;

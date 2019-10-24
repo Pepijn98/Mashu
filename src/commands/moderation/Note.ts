@@ -1,7 +1,6 @@
 import Command from "../../Command";
 import Mashu from "../../structures/MashuClient";
 import { ICommandContext } from "../../interfaces/ICommandContext";
-import { isGuildChannel } from "../../utils/Helpers";
 import { Message, AnyGuildChannel } from "eris";
 
 export default class Note extends Command {
@@ -52,7 +51,7 @@ export default class Note extends Command {
     }
 
     public async addNote(msg: Message, noteMessage: string, username: string, ctx: ICommandContext): Promise<Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();
@@ -75,7 +74,7 @@ export default class Note extends Command {
     }
 
     public async removeNote(msg: Message, username: string, client: Mashu, ctx: ICommandContext): Promise<Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();
@@ -153,7 +152,7 @@ export default class Note extends Command {
     }
 
     public async updateNote(msg: Message, username: string, client: Mashu, ctx: ICommandContext): Promise<Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();
@@ -235,7 +234,7 @@ export default class Note extends Command {
     }
 
     public async viewNotes(msg: Message, username: string, client: Mashu, ctx: ICommandContext): Promise<Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         const guild = await ctx.database.guild.findOne({ "id": channel.guild.id }).exec();

@@ -1,7 +1,6 @@
 import Command from "../../Command";
 import Mashu from "../../structures/MashuClient";
 import { ICommandContext } from "../../interfaces/ICommandContext";
-import { isGuildChannel } from "../../utils/Helpers";
 import { Message, AnyGuildChannel } from "eris";
 
 export default class Unban extends Command {
@@ -20,23 +19,23 @@ export default class Unban extends Command {
     }
 
     public async run(msg: Message, args: string[], client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         const userToUnban = args.shift() || "";
         const reason = args.join(" ");
 
         const bans = await channel.guild.getBans();
-        const entry = bans.find((e) => e.username.toLowerCase().indexOf(userToUnban.toLowerCase()) > -1);
+        const entry = bans.find((e) => e.user.username.toLowerCase().indexOf(userToUnban.toLowerCase()) > -1);
 
         if (!entry) return await msg.channel.createMessage("Couldn't find a user with that name on the ban list.");
 
         try {
-            await channel.guild.unbanMember(entry.id, reason);
+            await channel.guild.unbanMember(entry.user.id, reason);
 
             const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
             if (guild) {
-                const user = guild.users.find((o) => o.id === entry.id);
+                const user = guild.users.find((o) => o.id === entry.user.id);
                 let banCount = 1;
                 if (user) {
                     user.isBanned = false;
@@ -48,12 +47,12 @@ export default class Unban extends Command {
                         embed: {
                             title: "UNBAN",
                             color: settings.colors.unban,
-                            description: `**Unbanned:** ${entry.username}#${entry.discriminator}\n` +
+                            description: `**Unbanned:** ${entry.user.username}#${entry.user.discriminator}\n` +
                                 `**By:** ${msg.author.mention}\n` +
                                 `**Reason:** ${reason}\n` +
                                 `User has been banned ${banCount} ${banCount === 1 ? "time" : "times"}`,
                             timestamp: (new Date()).toISOString(),
-                            footer: { text: `ID: ${entry.id}` }
+                            footer: { text: `ID: ${entry.user.id}` }
                         }
                     });
                 }
@@ -70,7 +69,7 @@ export default class Unban extends Command {
         }
 
         try {
-            const chan = await entry.getDMChannel();
+            const chan = await entry.user.getDMChannel();
             await chan.createMessage(`You have been unbanned from: **${channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
         } catch (error) {
             await msg.channel.createMessage("Couldn't DM the unbanned user.");

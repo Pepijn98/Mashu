@@ -3,7 +3,6 @@ import Logger from "../utils/Logger";
 import { GuildModel } from "./Mongoose";
 import { ISettings } from "../interfaces/ISettings";
 import { ICommandHandlerOptions } from "../interfaces/Options";
-import { isGuildChannel } from "../utils/Helpers";
 import { Message, AnyGuildChannel, User } from "eris";
 import { Collection } from "@kurozero/collection";
 
@@ -64,7 +63,7 @@ export default class CommandHandler {
         }
 
         // Only check for permission if the command is used in a guild
-        if (isGuildChannel(msg.channel)) {
+        if (msg.channel.isGuildChannel) {
             const channel = msg.channel as AnyGuildChannel;
             const botPermissions = command.botPermissions;
             if (botPermissions.length > 0) {

@@ -1,6 +1,5 @@
 import Collection from "@kurozero/collection";
 import Command from "../Command";
-import { isGuildChannel } from "../utils/Helpers";
 import { ICommandStats } from "../interfaces/Options";
 import { IActiveMessage, IReactionButton } from "../interfaces/IActiveMessage";
 import { Client, Message, Emoji, ClientOptions, AnyGuildChannel } from "eris";
@@ -41,7 +40,7 @@ export default class Mashu extends Client {
 
             switch (action.type) {
                 case "cancel":
-                    if (isGuildChannel(msg.channel)) {
+                    if (msg.channel.isGuildChannel) {
                         const channel = (msg.channel as AnyGuildChannel);
                         await this.unwatchMessage(msg.id, channel.guild && msg.channel.id);
                     }

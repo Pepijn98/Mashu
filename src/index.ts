@@ -7,7 +7,6 @@ import CommandLoader from "./structures/CommandLoader";
 import Logger from "./utils/Logger";
 import { promises as fs } from "fs";
 import { GuildModel } from "./structures/Mongoose";
-import { isGuildChannel } from "./utils/Helpers";
 
 import "./utils/Extended";
 
@@ -134,7 +133,7 @@ async function main(): Promise<void> {
 
         // If message starts with our prefix check if it's a valid command, then execute the command if valid
         if (msg.content.startsWith(settings.prefix)) {
-            if (isGuildChannel(msg.channel) && msg.author.id !== client.user.id) {
+            if (msg.channel.isGuildChannel && msg.author.id !== client.user.id) {
                 await commandHandler.handleCommand(msg, false);
             } else if (msg.channel.type === 1) {
                 await commandHandler.handleCommand(msg, true);

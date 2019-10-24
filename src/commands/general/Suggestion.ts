@@ -3,7 +3,6 @@ import Command from "../../Command";
 import Mashu from "../../structures/MashuClient";
 import { ISuggestion } from "../../interfaces/Guild";
 import { IDatabaseContext, ICommandContext } from "../../interfaces/ICommandContext";
-import { isGuildChannel } from "../../utils/Helpers";
 import { Message, AnyGuildChannel, TextChannel } from "eris";
 
 const suggestionModPermission = "manageMessages";
@@ -72,7 +71,7 @@ const acceptOrDenySuggestion = async (msg: Message, db: IDatabaseContext, args: 
     if (msg.member && !msg.member.permission.has(suggestionModPermission))
         return await msg.channel.createMessage("Only mods with the permission `manageMessages` can use this command");
 
-    if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+    if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
     const channel = msg.channel as AnyGuildChannel;
 
     let id = 0;
@@ -129,7 +128,7 @@ export default class Suggestion extends Command {
     }
 
     public async run(msg: Message, args: string[], client: Mashu, { database }: ICommandContext): Promise<Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();

@@ -1,7 +1,7 @@
 import Command from "../../Command";
 import Mashu from "../../structures/MashuClient";
 import { ICommandContext, IDatabaseContext } from "../../interfaces/ICommandContext";
-import { isGuildChannel, sleep } from "../../utils/Helpers";
+import { sleep } from "../../utils/Helpers";
 import { Message, AnyGuildChannel } from "eris";
 
 export default class Setup extends Command {
@@ -38,7 +38,7 @@ export default class Setup extends Command {
     }
 
     public async askLogChannel(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         await msg.channel.createMessage(`${msg.author.mention}, What will be the log channel?\nPlease reply with either the channel name, id or mention the channel.`);
@@ -70,7 +70,7 @@ export default class Setup extends Command {
     }
 
     public async askSuggestionChannel(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         await msg.channel.createMessage(`${msg.author.mention}, What will be the suggestions channel?\nPlease reply with either the channel name, id or mention the channel.`);
@@ -102,7 +102,7 @@ export default class Setup extends Command {
     }
 
     public async askNotifyCreator(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         await msg.channel.createMessage(`${msg.author.mention}, Do you want to notify the creator of a suggestion when it gets accepted or denied?\nPlease reply with either (y)es or (n)o.`);
@@ -127,7 +127,7 @@ export default class Setup extends Command {
     }
 
     public async createMuteRole(msg: Message, database: IDatabaseContext): Promise<false | Message | undefined> {
-        if (!isGuildChannel(msg.channel)) return await msg.channel.createMessage("This can only be used in a guild");
+        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
         const channel = msg.channel as AnyGuildChannel;
 
         await msg.channel.createMessage(`${msg.author.mention}, Do you want to create a new muted role?\nPlease reply with either (y)es or (n)o.`);
