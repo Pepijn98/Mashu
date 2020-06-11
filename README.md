@@ -25,3 +25,5 @@ Attempt to create a moderation bot
 
 ## Support
 ![discord](https://discordapp.com/api/v6/guilds/240059867744698368/widget.png?style=banner2)
+
+# :)
