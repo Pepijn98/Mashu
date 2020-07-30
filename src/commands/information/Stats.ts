@@ -23,7 +23,7 @@ export default class Stats extends Command {
                 author: {
                     name: "Mashu Stats",
                     url: "https://mashu.xyz",
-                    icon_url: client.user.avatarURL // eslint-disable-line @typescript-eslint/camelcase
+                    icon_url: client.user.avatarURL
                 },
                 thumbnail: {
                     url: client.user.avatarURL

@@ -6,13 +6,15 @@ module.exports = {
         "es6": true,
         "node": true
     },
-    "extends": [
-        "plugin:@typescript-eslint/recommended"
-    ],
     "parserOptions": {
         "ecmaVersion": 10,
         "parser": "@typescript-eslint/parser"
     },
+    "plugins": ["@typescript-eslint/eslint-plugin"],
+    "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+    ],
     "rules": {
         "@typescript-eslint/explicit-function-return-type": ["error", {
             "allowExpressions": true

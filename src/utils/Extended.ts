@@ -1,4 +1,4 @@
-import { IMessageCollectorOptions } from "src/interfaces/Options";
+import { IMessageCollectorOptions } from "../interfaces/Options";
 import { EventEmitter } from "events";
 import { AnyChannel, Channel, User, Member, Message, Client, AnyGuildChannel } from "eris";
 

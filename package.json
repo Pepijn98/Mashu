@@ -1,26 +1,26 @@
 {
     "name": "mashu",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "Attempt to create a moderation bot",
     "engines": {
-        "yarn": ">=1.16.0"
+        "yarn": ">=1.0.0 <2.0.0"
     },
     "author": {
-        "email": "root@kurozeropb.info",
-        "name": "KurozeroPB",
-        "url": "https://kurozeropb.info"
+        "email": "pepijn@vdbroek.dev",
+        "name": "Pepijn van den Broek",
+        "url": "https://vdbroek.dev"
     },
     "main": "src/index.js",
     "license": "MIT",
     "keywords": [],
-    "homepage": "https://github.com/KurozeroPB/Mashu#readme",
+    "homepage": "https://github.com/Pepijn98/Mashu#readme",
     "bugs": {
-        "email": "root@kurozeropb.info",
-        "url": "https://github.com/KurozeroPB/Mashu/issues"
+        "email": "pepijn@vdbroek.dev",
+        "url": "https://github.com/Pepijn98/Mashu/issues"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/KurozeroPB/Mashu.git"
+        "url": "git+https://github.com/Pepijn98/Mashu.git"
     },
     "scripts": {
         "deploy": "pm2 start ecosystem.config.js --env production",
@@ -29,36 +29,36 @@
         "test": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/index.ts",
         "pretest": "yarn check && yarn lint",
         "reinstall": "yarn clean && yarn install",
-        "clean": "rm -rf ./node_modules && rm ./yarn.lock",
+        "clean": "rm -rf ./node_modules ./yarn.lock",
         "check": "gts check",
         "fix": "gts fix",
         "lint": "eslint --ext .ts .",
         "lint:fix": "eslint --ext .ts --fix ."
     },
     "dependencies": {
-        "@kurozero/collection": "^0.4.8",
-        "bluebird": "^3.7.1",
+        "@kurozero/collection": "^0.5.1",
+        "bluebird": "^3.7.2",
         "bufferutil": "^4.0.1",
-        "chalk": "^2.4.2",
-        "cross-env": "^6.0.3",
-        "eris": "^0.11.0",
+        "chalk": "^4.1.0",
+        "cross-env": "^7.0.2",
+        "eris": "^0.13.3",
         "erlpack": "abalabahaha/erlpack",
-        "moment": "^2.24.0",
-        "mongoose": "^5.7.7",
+        "moment": "^2.27.0",
+        "mongoose": "^5.9.26",
         "os-utils": "oscmejia/os-utils",
-        "winston": "^3.2.1",
-        "zlib-sync": "^0.1.5"
+        "winston": "^3.3.3",
+        "yukikaze": "^0.3.0",
+        "zlib-sync": "^0.1.7"
     },
     "devDependencies": {
-        "@types/mongoose": "^5.5.23",
-        "@types/node": "^12.11.7",
-        "@typescript-eslint/eslint-plugin": "^2.5.0",
-        "@typescript-eslint/parser": "^2.5.0",
-        "eslint": "^6.5.1",
-        "gts": "^1.1.0",
-        "ts-node": "^8.4.1",
+        "@types/mongoose": "^5.7.34",
+        "@types/node": "^14.0.27",
+        "@typescript-eslint/eslint-plugin": "^3.7.1",
+        "@typescript-eslint/parser": "^3.7.1",
+        "eslint": "^7.5.0",
+        "gts": "^2.0.2",
+        "ts-node": "^8.10.2",
         "tsconfig-paths": "^3.9.0",
-        "tslint": "^5.20.0",
-        "typescript": "^3.6.4"
+        "typescript": "^3.9.7"
     }
 }

@@ -131,7 +131,7 @@ client.on("messageCreate", async (msg) => {
 });
 
 process.on("unhandledRejection", (reason) => {
-    logger.error("UNHANDLED_REJECTION", reason);
+    logger.error("UNHANDLED_REJECTION", reason as any);
 });
 
 process.on("SIGINT", () => {

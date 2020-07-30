@@ -39,8 +39,12 @@ export default class Logger {
         this._log.warn(message, { label });
     }
 
-    public error(label: string, error: any): void {
-        this._log.error(error.stack ? error.stack : error.toString(), { label });
+    public error(label: string, error: Error | string = "Unknown Error"): void {
+        if (error instanceof Error) {
+            this._log.error(error.stack ? error.stack : error.toString(), { label });
+        } else {
+            this._log.error(error, { label });
+        }
     }
 
     private _getColored(logLevel: string): string {

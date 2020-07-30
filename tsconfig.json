@@ -8,7 +8,15 @@
         "resolveJsonModule": true,
         "rootDir": ".",
         "outDir": "build",
-        "typeRoots": ["./node_modules/@types", "./src/@types"]
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/@types"
+        ],
+        "paths": {
+            "*": ["node_modules/*"],
+            "~/*": ["src/*"],
+            "@/*": ["*"]
+        }
     },
     "include": [
         "src/**/*"

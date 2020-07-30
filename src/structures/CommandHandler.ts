@@ -21,7 +21,7 @@ export default class CommandHandler {
         const parts = msg.content.split(" ");
         const name = parts[0].slice(this.settings.prefix.length);
 
-        const command = this.client.commands.find((cmd) => cmd.name === name || cmd.aliases.indexOf(name) !== -1);
+        const command = this.client.commands.find((cmd) => cmd.name === name || cmd.aliases.indexOf(name) !== -1)?.value;
         if (!command) return false; // Command doesn't exist
 
         this.client.stats.commandsExecuted++;
