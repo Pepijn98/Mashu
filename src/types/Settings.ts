@@ -13,6 +13,16 @@ export interface IDatabase {
     host: string;
     port: number;
     name: string;
+    user: string;
+    pwd: string;
+}
+
+export interface IOptions {
+    guild: string;
+    muteRole: string;
+    logChannel: string;
+    suggestionChannel: string;
+    notifyCreator: boolean;
 }
 
 export interface ISettings {
@@ -21,4 +31,5 @@ export interface ISettings {
     prefix: string;
     colors: IColors;
     database: IDatabase;
+    options: IOptions;
 }

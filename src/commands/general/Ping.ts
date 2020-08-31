@@ -1,8 +1,8 @@
-import Command from "../../Command";
+import Command from "~/Command";
 import { Message } from "eris";
 
 export default class Ping extends Command {
-    public constructor(category: string) {
+    constructor(category: string) {
         super({
             name: "ping",
             description: "Testing the bot",
@@ -12,7 +12,7 @@ export default class Ping extends Command {
         });
     }
 
-    public async run(msg: Message): Promise<void> {
+    async run(msg: Message): Promise<void> {
         await msg.channel.createMessage("Pong!");
     }
 }

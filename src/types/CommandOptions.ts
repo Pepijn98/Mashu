@@ -1,14 +1,5 @@
-import Mashu from "../structures/MashuClient";
-import Logger from "../utils/Logger";
-import { ISettings } from "./ISettings";
-import { User } from "eris";
 import Collection from "@kurozero/collection";
-
-export interface ICommandHandlerOptions {
-    settings: ISettings;
-    client: Mashu;
-    logger: Logger;
-}
+import { User } from "eris";
 
 export interface ICommandOptions {
     name: string;

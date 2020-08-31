@@ -1,10 +1,11 @@
-import Command from "../../Command";
-import Mashu from "../../structures/MashuClient";
-import { ICommandContext } from "../../interfaces/ICommandContext";
-import { Message, AnyGuildChannel } from "eris";
+import Command from "~/Command";
+import Users from "~/models/Users";
+import settings from "~/settings";
+import { Message } from "eris";
+import { isGuildChannel } from "~/utils/Utils";
 
 export default class Remove extends Command {
-    public constructor(category: string) {
+    constructor(category: string) {
         super({
             name: "remove",
             description: "Remove a violation from a user = \n = (this does not actually unban the member use `unban` for that)",
@@ -19,37 +20,69 @@ export default class Remove extends Command {
         });
     }
 
-    public async run(msg: Message, args: string[], _client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
-        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
-        const channel = msg.channel as AnyGuildChannel;
+    async run(msg: Message, args: string[]): Promise<void> {
+        if (!isGuildChannel(msg.channel)) {
+            await msg.channel.createMessage("This can only be used in a guild");
+            return;
+        }
 
         const type = args.shift();
         const id = args.shift();
-        const member = this.findMember(msg, args.join(" "));
-        if (!member) return await msg.channel.createMessage("Couldn't find a member.");
+        const member = this.findMember(msg.channel, args.join(" "));
+        if (!member) {
+            await msg.channel.createMessage("Couldn't find a member");
+            return;
+        }
 
         try {
-            const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
-            if (guild) {
-                const user = guild.users.find((o) => o.id === member.user.id);
-
-                let message = "";
-                if (user) {
-                    if (type === "warning") {
-                        user.warns = user.warns.filter((w) => w.id !== id);
-                        message = `Successfully remove warning \`${id}\``;
-                    } else if (type === "ban") {
-                        user.bans = user.bans.filter((w) => w.id !== id);
-                        message = `Succesfully remove ban \`${id}\``;
-                    } else if (type === "kick") {
-                        user.kicks = user.kicks.filter((w) => w.id !== id);
-                        message = `Succesfully remove kick \`${id}\``;
-                    }
-                }
-
-                await database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
-                await msg.channel.createMessage(message);
+            const user = await Users.findOne({ id: member.user.id }).exec();
+            if (!user) {
+                await msg.channel.createMessage("User is not registered in the database");
+                return;
             }
+
+            let message = "";
+            switch (type) {
+                case "warning":
+                    if (user.warns.length <= 0) {
+                        msg.channel.createMessage("User has never been warned");
+                        return;
+                    }
+                    const validWarn = user.warns.find((w) => w.id === id);
+                    if (!validWarn) {
+                        return;
+                    }
+                    user.warns.remove({ id });
+                    message = `Successfully remove warning \`${id}\``;
+                    break;
+                case "ban":
+                    if (user.bans.length <= 0) {
+                        msg.channel.createMessage("User has never been banned");
+                        return;
+                    }
+                    const validBan = user.bans.find((w) => w.id === id);
+                    if (!validBan) {
+                        return;
+                    }
+                    user.bans.remove({ id });
+                    message = `Succesfully remove ban \`${id}\``;
+                    break;
+                case "kick":
+                    if (user.kicks.length <= 0) {
+                        msg.channel.createMessage("User has never been kicked");
+                        return;
+                    }
+                    const validKick = user.kicks.find((w) => w.id === id);
+                    if (!validKick) {
+                        return;
+                    }
+                    user.kicks.remove({ id });
+                    message = `Succesfully remove kick \`${id}\``;
+                    break;
+            }
+
+            await user.save();
+            await msg.channel.createMessage(message);
         } catch (error) {
             await msg.channel.createMessage({
                 embed: {

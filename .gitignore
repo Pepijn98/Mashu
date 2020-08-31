@@ -62,3 +62,4 @@ typings/
 
 # bot configs
 settings.ts
+terminator.js

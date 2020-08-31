@@ -1,18 +1,22 @@
 import Collection from "@kurozero/collection";
-import Command from "../Command";
-import { ICommandStats } from "../interfaces/Options";
-import { IActiveMessage, IReactionButton } from "../interfaces/IActiveMessage";
-import { Client, Message, Emoji, ClientOptions, AnyGuildChannel } from "eris";
+import Command from "~/Command";
+import Logger from "./Logger";
+import { isGuildChannel } from "./Utils";
+import { ICommandStats } from "~/types/CommandOptions";
+import { IActiveMessage, IReactionButton } from "~/types/ActiveMessage";
+import { Client, Message, Emoji, ClientOptions } from "eris";
 
 export default class Mashu extends Client {
-    public commands: Collection<Command>;
-    public activeMessages: Record<string|number|symbol, IActiveMessage>; // TODO: Maybe use a Collection for this
-    public ready = false;
-    public stats: ICommandStats;
+    logger: Logger;
+    commands: Collection<Command>;
+    activeMessages: Record<string | number | symbol, IActiveMessage>; // TODO: Maybe use a Collection for this
+    stats: ICommandStats;
+    ready = false;
 
-    public constructor(token: string, options: ClientOptions) {
+    constructor(logger: Logger, token: string, options: ClientOptions) {
         super(token, options);
 
+        this.logger = logger;
         this.commands = new Collection(Command);
         this.activeMessages = {};
         this.stats = {
@@ -26,7 +30,7 @@ export default class Mashu extends Client {
     }
 
     /** Handle reactions added/removed for a paginated message */
-    public async onMessageReactionEvent(msg: Message, emoji: Emoji, userID: string): Promise<void> {
+    async onMessageReactionEvent(msg: Message, emoji: Emoji, userID: string): Promise<void> {
         if (!this.ready || userID === this.user.id || !(msg.content || msg.embeds || msg.attachments)) {
             return;
         }
@@ -40,9 +44,8 @@ export default class Mashu extends Client {
 
             switch (action.type) {
                 case "cancel":
-                    if (msg.channel.isGuildChannel) {
-                        const channel = (msg.channel as AnyGuildChannel);
-                        await this.unwatchMessage(msg.id, channel.guild && msg.channel.id);
+                    if (isGuildChannel(msg.channel)) {
+                        await this.unwatchMessage(msg.id, msg.channel.guild && msg.channel.id);
                     }
                     break;
                 case "next":
@@ -70,7 +73,7 @@ export default class Mashu extends Client {
     }
 
     /** Remove message from active messages */
-    public async unwatchMessage(id: string, channelId: string): Promise<void> {
+    async unwatchMessage(id: string, channelId: string): Promise<void> {
         Reflect.deleteProperty(this.activeMessages, id);
         if (channelId) {
             await this.removeMessageReactions(channelId, id);
@@ -78,14 +81,8 @@ export default class Mashu extends Client {
     }
 
     /** Create a message with reaction buttons */
-    public async reactionButtonMessage(
-        msg: Message,
-        messageQueue: string[],
-        reactionButtonTimeout: number,
-        queueIndex: number,
-        reactionButtons: IReactionButton[]
-    ): Promise<void> {
-        let self = await this.createMessage(msg.channel.id, messageQueue[queueIndex]);
+    async reactionButtonMessage(msg: Message, messageQueue: string[], reactionButtonTimeout: number, queueIndex: number, reactionButtons: IReactionButton[]): Promise<void> {
+        const self = await this.createMessage(msg.channel.id, messageQueue[queueIndex]);
 
         reactionButtons.forEach((button) => self.addReaction(button.emoji));
         this.activeMessages[self.id] = {

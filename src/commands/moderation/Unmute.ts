@@ -1,10 +1,12 @@
-import Command from "../../Command";
-import Mashu from "../../structures/MashuClient";
-import { ICommandContext } from "../../interfaces/ICommandContext";
-import { Message, AnyGuildChannel } from "eris";
+import Command from "~/Command";
+import settings from "~/settings";
+import Users from "~/models/Users";
+import { ICommandContext } from "~/types/ICommandContext";
+import { Message } from "eris";
+import { isGuildChannel } from "~/utils/Utils";
 
 export default class Mute extends Command {
-    public constructor(category: string) {
+    constructor(category: string) {
         super({
             name: "unmute",
             description: "Unmute a user in the current guild",
@@ -18,40 +20,53 @@ export default class Mute extends Command {
         });
     }
 
-    public async run(msg: Message, args: string[], client: Mashu, { settings, database }: ICommandContext): Promise<Message | undefined> {
-        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
-        const channel = msg.channel as AnyGuildChannel;
+    async run(msg: Message, args: string[], { client }: ICommandContext): Promise<void> {
+        if (!isGuildChannel(msg.channel)) {
+            await msg.channel.createMessage("This can only be used in a guild");
+            return;
+        }
 
-        const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
-        if (guild && guild.muteRole) {
+        if (settings.options.muteRole) {
             const userToUnmute = args.shift() || "";
             const reason = args.join(" ");
-            const member = this.findMember(msg, userToUnmute);
-            if (!member) return await msg.channel.createMessage(`Couldn't find a member with the name **${userToUnmute}**`);
-
-            const user = guild.users.find((u) => u.id === member.user.id);
-            if (user) {
-                user.isMuted = false;
-            } else {
-                guild.users.push({ id: member.user.id, isMuted: false, isBanned: false, warns: [], bans: [], kicks: [], notes: [] });
+            const member = this.findMember(msg.channel, userToUnmute);
+            if (!member) {
+                await msg.channel.createMessage(`Couldn't find a member with the name **${userToUnmute}**`);
+                return;
             }
 
-            if (guild.logChannel) {
-                await client.createMessage(guild.logChannel, {
+            try {
+                await member.removeRole(settings.options.muteRole, reason);
+
+                const user = await Users.findOne({ id: member.user.id }).exec();
+                if (user) {
+                    user.isMuted = false;
+                }
+
+                if (settings.options.logChannel) {
+                    await client.createMessage(settings.options.logChannel, {
+                        embed: {
+                            title: "UNMUTE",
+                            color: settings.colors.unmute,
+                            description: `**Unmuted:** ${member.user.mention}\n` + `**By:** ${msg.author.mention}\n` + `**Reason:** ${reason}`,
+                            timestamp: new Date().toISOString(),
+                            footer: {
+                                text: `ID: ${member.user.id}`
+                            }
+                        }
+                    });
+                }
+
+                await user?.save();
+            } catch (error) {
+                await msg.channel.createMessage({
                     embed: {
-                        title: "UNMUTE",
-                        color: settings.colors.unmute,
-                        description: `**Unmuted:** ${member.user.mention}\n` +
-                            `**By:** ${msg.author.mention}\n` +
-                            `**Reason:** ${reason}`,
-                        timestamp: (new Date()).toISOString(),
-                        footer: { text: `ID: ${member.user.id}` }
+                        color: settings.colors.error,
+                        description: error.toString()
                     }
                 });
+                return;
             }
-
-            await member.removeRole(guild.muteRole, reason);
-            await database.guild.updateOne({ "id": channel.guild.id }, guild).exec();
         }
     }
 }

@@ -1,18 +1,19 @@
-import { IMessageCollectorOptions } from "../interfaces/Options";
+import { IMessageCollectorOptions } from "../types/CommandOptions";
 import { EventEmitter } from "events";
 import { AnyChannel, Channel, User, Member, Message, Client, AnyGuildChannel } from "eris";
+import { isGuildChannel, isPrivateChannel } from "./Utils";
 
 /** A message collector for awaiting messages */
 export class MessageCollector extends EventEmitter {
-    public filter: (message: Message) => boolean;
-    public channel: AnyChannel;
-    public options: IMessageCollectorOptions;
-    public ended: boolean;
-    public collected: Message[];
-    public bot: Client;
-    public listener: (message: Message) => any;
+    filter: (message: Message) => boolean;
+    channel: AnyChannel;
+    options: IMessageCollectorOptions;
+    ended: boolean;
+    collected: Message[];
+    bot: Client;
+    listener: (message: Message) => any;
 
-    public constructor(channel: AnyChannel, filter: (message: Message) => boolean, options: IMessageCollectorOptions) {
+    constructor(channel: AnyChannel, filter: (message: Message) => boolean, options: IMessageCollectorOptions) {
         super();
         this.filter = filter;
         this.channel = channel;
@@ -26,7 +27,7 @@ export class MessageCollector extends EventEmitter {
         if (options.time) setTimeout(() => this.stop("time"), options.time);
     }
 
-    public verify(message: Message): boolean {
+    verify(message: Message): boolean {
         if (this.channel.id !== message.channel.id) return false;
         if (this.filter(message)) {
             this.collected.push(message);
@@ -37,7 +38,7 @@ export class MessageCollector extends EventEmitter {
         return false;
     }
 
-    public stop(reason: string): void {
+    stop(reason: string): void {
         if (this.ended) return;
         this.ended = true;
         this.bot.removeListener("messageCreate", this.listener);
@@ -46,20 +47,20 @@ export class MessageCollector extends EventEmitter {
 }
 
 /** Capitalize the first letter of a string */
-String.prototype.capitalize = function (): string { // eslint-disable-line no-extend-native
+String.prototype.capitalize = function (): string {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
 /** Paginate over an array */
-Array.prototype.paginate = function <T>(pageSize: number, pageNumber: number): T[] { // eslint-disable-line no-extend-native
+Array.prototype.paginate = function <T>(pageSize: number, pageNumber: number): T[] {
     --pageNumber;
     return this.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
 };
 
-Array.prototype.remove = function <T>(item: T): T[] { // eslint-disable-line no-extend-native
+/** Remove item from array (modifies the current array AND returns it) */
+Array.prototype.remove = function <T>(item: T): T[] {
     for (let i = 0; i < this.length; i++) {
-        if (this[i] === item)
-            this.splice(i, 1);
+        if (this[i] === item) this.splice(i, 1);
     }
     return this;
 };
@@ -72,23 +73,19 @@ Channel.prototype.awaitMessages = function (filter: (message: Message) => boolea
 
 Object.defineProperty(Channel.prototype, "isGuildChannel", {
     get: function () {
-        switch (this.type) {
-            case 0: return true; // TextChannel
-            case 2: return true; // VoiceChannel
-            case 4: return true; // CategoryChannel
-            case 5: return true; // NewsChannel
-            case 6: return true; // StoreChannel
-            default: return false;
-        }
+        return isGuildChannel(this);
     }
 });
 
 Object.defineProperty(Channel.prototype, "isDMChannel", {
     get: function () {
-        switch (this.type) {
-            case 1: return true;
-            default: return false;
-        }
+        return this.isPrivateChannel;
+    }
+});
+
+Object.defineProperty(Channel.prototype, "isPrivateChannel", {
+    get: function () {
+        return isPrivateChannel(this);
     }
 });
 

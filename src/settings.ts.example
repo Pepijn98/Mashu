@@ -1,0 +1,33 @@
+import { ISettings } from "~/interfaces/Settings";
+
+const settings: ISettings = {
+    token: "", // Your bot's token
+    owner: "", // Your user id
+    prefix: "m/",
+    colors: { // Hex colors that will be used for embeds
+        default: 0xf0dee0,
+        error: 0xdc143c,
+        ban: 0xd10029,
+        unban: 0x77bc00,
+        warn: 0xeaab24,
+        kick: 0xf43900,
+        mute: 0xeadc24,
+        unmute: 0x77bc00
+    },
+    database: {
+        host: "", // Databse host (localhost, ip address or domain name)
+        port: 27017, // Mongodb port (default mongo port is 27017)
+        name: "", // Database name
+        user: "", // Database user that can modify the collections (insert, delete, modify etc.)
+        pwd: "" // Password of the db user
+    },
+    options: {
+        guild: "", // id of the server the bot is used in
+        muteRole: "", // id of the role that will be assign when someone is muted
+        logChannel: "", // id of the channel where the bot will post all the logs
+        suggestionChannel: "", // id of the channel where people can post suggestions
+        notifyCreator: true // whether to notify the creator of a suggestion that their suggestion got accepted/denied
+    }
+};
+
+export default settings;

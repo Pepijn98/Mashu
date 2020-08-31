@@ -1,22 +1,19 @@
 import chalk from "chalk";
 import moment from "moment";
-import {
-    Logger as WinstonLogger,
-    createLogger,
-    format,
-    transports
-} from "winston";
+import { Logger as WinstonLogger, createLogger, format, transports } from "winston";
 
 /** Custom logger, you know, this logs stuff to the terminal with pretty colors and timestamps :O */
 export default class Logger {
     private _log: WinstonLogger;
 
-    public constructor() {
+    constructor() {
         this._log = createLogger({
             level: "warn",
             format: format.combine(
                 format.timestamp(),
-                format.printf((log) => `${moment(log.timestamp).format("DD/MM/YYYY, hh:mm:ss")} ${chalk.black.bgGreen(`[${log.label}]`)} ${this._getColored(log.level)}: ${log.message}`)
+                format.printf(
+                    (log) => `${moment(log.timestamp).format("DD/MM/YYYY, hh:mm:ss")} ${chalk.black.bgGreen(`[${log.label}]`)} ${this._getColored(log.level)}: ${log.message}`
+                )
             ),
             transports: [
                 new transports.Console({
@@ -27,19 +24,19 @@ export default class Logger {
         });
     }
 
-    public ready(message: string): void {
+    ready(message: string): void {
         this._log.info(message, { label: "READY" });
     }
 
-    public info(label: string, message: string): void {
+    info(label: string, message: string): void {
         this._log.info(message, { label });
     }
 
-    public warn(label: string, message: string): void {
+    warn(label: string, message: string): void {
         this._log.warn(message, { label });
     }
 
-    public error(label: string, error: Error | string = "Unknown Error"): void {
+    error(label: string, error: Error | string = "Unknown Error"): void {
         if (error instanceof Error) {
             this._log.error(error.stack ? error.stack : error.toString(), { label });
         } else {

@@ -1,11 +1,11 @@
-import Command from "../../Command";
-import Mashu from "../../structures/MashuClient";
-import { version } from "../../../package.json";
-import { formatSeconds } from "../../utils/Helpers";
+import Command from "~/Command";
+import { version } from "@/package.json";
+import { formatSeconds } from "~/utils/Utils";
 import { Message, GuildChannel } from "eris";
+import { ICommandContext } from "~/types/ICommandContext";
 
 export default class Stats extends Command {
-    public constructor(category: string) {
+    constructor(category: string) {
         super({
             name: "stats",
             description: "",
@@ -16,7 +16,7 @@ export default class Stats extends Command {
         });
     }
 
-    public async run(msg: Message, _args: string[], client: Mashu): Promise<Message | undefined> {
+    async run(msg: Message, _args: string[], { client }: ICommandContext): Promise<Message | undefined> {
         return msg.channel.createMessage({
             embed: {
                 color: 0,

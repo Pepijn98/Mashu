@@ -1,7 +1,12 @@
 # Mashu
-Attempt to create a moderation bot
+Mashu is a private moderation bot. \
+If you wish to use mashu you have to host her yourself. \
+I will not help you with self hosting but these are some requirements:
+- An enviroment with nodejs(v14+), yarn and mongodb (preferably on a linux vps)
+- A discord bot application
+- Understanding of typescript (or javascript) since you need to edit some properties
 
-[invite me](https://discordapp.com/oauth2/authorize?client_id=419642001424646145&scope=bot&permissions=268823678&redirect_uri=https%3A%2F%2Fmashu.xyz%3Fredirect%3Ddiscordapp)
+If at least one of these don't apply to you and you don't know how to get it please save yourself some time and just get a moderation bot from [bots.ondiscord.xyz](https://bots.ondiscord.xyz/search?tags=Moderation)
 
 ## Commands
 | Command | Description | Category |
@@ -24,6 +29,4 @@ Attempt to create a moderation bot
 | `exec` | Execute shell shit | Owner |
 
 ## Support
-[![discord](https://discordapp.com/api/v6/guilds/240059867744698368/widget.png?style=banner2)](https://discord.gg/p895czC)
-
-# :)
+[![discord](https://discord.com/api/guilds/240059867744698368/widget.png?style=banner2)](https://discord.gg/p895czC)

@@ -1,103 +1,114 @@
-import SuggestionController from "../../controller/SuggestionController";
-import Command from "../../Command";
-import Mashu from "../../structures/MashuClient";
-import { ISuggestion } from "../../interfaces/Guild";
-import { IDatabaseContext, ICommandContext } from "../../interfaces/ICommandContext";
-import { Message, AnyGuildChannel, TextChannel } from "eris";
+import settings from "~/settings";
+import SuggestionController from "~/controller/SuggestionController";
+import Command from "~/Command";
+import Mashu from "~/utils/MashuClient";
+import { ICommandContext } from "~/types/ICommandContext";
+import { ISuggestion } from "~/types/mongo/Suggestions";
+import { isGuildChannel } from "~/utils/Utils";
+import { Message, TextChannel, EmbedField, EmbedOptions } from "eris";
 
-const suggestionModPermission = "manageMessages";
+const suggestionPermission = "manageMessages";
+const controller = new SuggestionController();
 
-interface SuggestionEmbedField {
-    name?: string | undefined;
-    value?: string | undefined;
-    inline?: boolean | undefined;
-}
-
-interface SuggestionEmbed {
-    title: string;
-    color: number;
-    fields: SuggestionEmbedField[];
-}
-
-const suggestionController = new SuggestionController();
-const createSuggestionEmbed = (suggestion: ISuggestion, created = false): SuggestionEmbed => {
-    let fields: { name?: string; value?: string; inline?: boolean }[] = [
-        { name: "id", value: suggestion.id.toString(), inline: true },
-        { name: "state", value: suggestion.state, inline: true }
-    ];
-    if (suggestion.state !== "created") {
-        if (suggestion.modId) {
-            fields.push({ name: "Mod", value: suggestion.moderator });
+function createSuggestionEmbed(suggestion: ISuggestion, created = false): EmbedOptions {
+    const fields: EmbedField[] = [
+        {
+            name: "id",
+            value: String(suggestion.sid),
+            inline: true
+        },
+        {
+            name: "state",
+            value: suggestion.state || "\u200b",
+            inline: true
         }
+    ];
+
+    if (suggestion.state !== "created" && suggestion.modId) {
+        fields.push({ name: "Mod", value: suggestion.moderator || "" });
     }
+
     fields.push({ name: "Content", value: `\`\`\`${suggestion.content.substring(0, 1000)}\`\`\`` });
+
     if (suggestion.content.length > 1000) {
         fields.push({ name: "--------", value: `\`\`\`${suggestion.content.substring(1000, 2000)}\`\`\`` });
     }
+
     return {
         title: `${created ? "New " : ""}Suggestion by ${suggestion.creator}(${suggestion.creatorId})`,
         color: 120564,
         fields
     };
-};
+}
 
-const createSuggestionListEmbed = (suggestions: ISuggestion[], page: number, maxPage: number): SuggestionEmbed => {
-    let fields = [];
-    for (let suggestion of suggestions) {
+function createSuggestionListEmbed(suggestions: ISuggestion[], page: number, maxPage: number): EmbedOptions {
+    const fields: EmbedField[] = [];
+
+    for (const suggestion of suggestions) {
         fields.push({
-            name: `Suggestion ${suggestion.id}`,
-            value: "```\n" +
-                `id: ${suggestion.id}\n` +
+            name: `Suggestion ${suggestion.sid}`,
+            value:
+                "```\n" +
+                `id: ${suggestion.sid}\n` +
                 `Made by: ${suggestion.creator}(${suggestion.creatorId})\n` +
                 `State: ${suggestion.state}${suggestion.state !== "created" ? `\nMod: ${suggestion.moderator}` : ""}\`\`\``
         });
     }
+
     return {
         title: `Suggestion list Page ${page}/${maxPage}`,
         color: 120564,
         fields
     };
-};
+}
 
-const parseNumber = (number: string): number => {
-    let parsedNumber = parseInt(number); // eslint-disable-line radix
+function parseNumber(number: string): number {
+    const parsedNumber = parseInt(number);
     if (isNaN(parsedNumber)) {
         throw new Error("Not a number");
     }
     return parsedNumber;
-};
+}
 
-const acceptOrDenySuggestion = async (msg: Message, db: IDatabaseContext, args: string[], type: "accept" | "deny", client: Mashu): Promise<Message> => {
-    if (msg.member && !msg.member.permission.has(suggestionModPermission))
-        return await msg.channel.createMessage("Only mods with the permission `manageMessages` can use this command");
+async function acceptOrDenySuggestion(client: Mashu, msg: Message, args: string[], type: "accept" | "deny"): Promise<void> {
+    if (msg.member && !msg.member.permission.has(suggestionPermission)) {
+        await msg.channel.createMessage("Only mods with the permission `manageMessages` can use this command");
+        return;
+    }
 
-    if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
-    const channel = msg.channel as AnyGuildChannel;
+    if (!isGuildChannel(msg.channel)) {
+        await msg.channel.createMessage("This can only be used in a guild");
+        return;
+    }
 
     let id = 0;
     try {
         id = parseNumber(args[0]);
     } catch (e) {
-        return await msg.channel.createMessage("Please use a numeric id.");
+        await msg.channel.createMessage("Please use a numeric id");
+        return;
     }
 
-    let suggestion = await suggestionController.getSuggestion(channel.guild.id, id);
-    if (!suggestion)
-        return await msg.channel.createMessage(`Suggestion with id ${id} could not be found`);
+    let suggestion = await controller.getSuggestion(id);
+    if (!suggestion) {
+        await msg.channel.createMessage(`Suggestion with id ${id} could not be found`);
+        return;
+    }
 
     if (type === "accept") {
-        await suggestionController.acceptSuggestion(channel.guild.id, suggestion.id, msg.author, client);
+        await controller.acceptSuggestion(client, msg.author, suggestion.sid);
     } else {
-        await suggestionController.declineSuggestion(channel.guild.id, suggestion.id, msg.author, client);
+        await controller.declineSuggestion(client, msg.author, suggestion.sid);
     }
 
-    suggestion = await suggestionController.getSuggestion(channel.guild.id, id);
+    suggestion = await controller.getSuggestion(id);
     try {
-        const guild = await db.guild.findOne({ "id": channel.guild.id }).exec();
-        if (!guild || !guild.suggestionChannel)
-            return await msg.channel.createMessage("Please use the setup command before using suggestions");
+        if (!settings.options.suggestionChannel) {
+            await msg.channel.createMessage("No suggestion channel specified in the settings!");
+            return;
+        }
 
-        const notificationChannel = channel.guild.channels.get(guild.suggestionChannel) as TextChannel;
+        const notificationChannel = msg.channel.guild.channels.get(settings.options.suggestionChannel) as TextChannel;
         if (notificationChannel && suggestion) {
             const notificationMessage = await notificationChannel.getMessage(suggestion.notificationId);
             if (notificationMessage) {
@@ -108,11 +119,12 @@ const acceptOrDenySuggestion = async (msg: Message, db: IDatabaseContext, args: 
         console.error(e);
     }
 
-    return await msg.channel.createMessage(`Successfully ${type === "accept" ? "accepted" : "denied"} suggestion ${suggestion ? suggestion.id : "Unknown"}`);
-};
+    await msg.channel.createMessage(`Successfully ${type === "accept" ? "accepted" : "denied"} suggestion ${suggestion ? suggestion.sid : "Unknown"}`);
+    return;
+}
 
 export default class Suggestion extends Command {
-    public constructor(category: string) {
+    constructor(category: string) {
         super({
             name: "suggestion",
             description: "Create, show, list, accept and deny suggestions",
@@ -127,49 +139,66 @@ export default class Suggestion extends Command {
         });
     }
 
-    public async run(msg: Message, args: string[], client: Mashu, { database }: ICommandContext): Promise<Message | undefined> {
-        if (!msg.channel.isGuildChannel) return await msg.channel.createMessage("This can only be used in a guild");
-        const channel = msg.channel as AnyGuildChannel;
+    async run(msg: Message, args: string[], { client }: ICommandContext): Promise<void> {
+        if (!isGuildChannel(msg.channel)) {
+            await msg.channel.createMessage("This can only be used in a guild");
+            return;
+        }
 
-        const guild = await database.guild.findOne({ "id": channel.guild.id }).exec();
-        if (!guild || !guild.suggestionChannel)
-            return await msg.channel.createMessage("Please use the setup command before using suggestions");
+        if (!settings.options.suggestionChannel) {
+            await msg.channel.createMessage("No suggestion channel specified in the settings!");
+            return;
+        }
 
         const action = args.shift();
         if (args.length >= 1) {
             switch (action) {
                 case "create": {
-                    if (args.length < 1)
-                        return await msg.channel.createMessage("Oops, it seems like you did not add a suggestion");
+                    if (args.length < 1) {
+                        await msg.channel.createMessage("Oops, it seems like you did not add a suggestion");
+                        return;
+                    }
 
                     const content = args.join(" ");
-                    const notificationMessage = await client.createMessage(guild.suggestionChannel, `New Suggestion by ${msg.author.username}#${msg.author.discriminator}`);
-                    const suggestion = await suggestionController.createSuggestion(content, msg.author, channel.guild.id, notificationMessage.id);
+                    const notificationMessage = await client.createMessage(settings.options.suggestionChannel, `New Suggestion by ${msg.author.tag}`);
+                    const suggestion = await controller.createSuggestion(content, msg.author, notificationMessage.id);
                     await notificationMessage.edit({ content: "", embed: createSuggestionEmbed(suggestion!, true) });
-                    return await msg.channel.createMessage(`Your suggestion was created successfully and has the id: **${suggestion!.id}**`);
+                    await msg.channel.createMessage(`Your suggestion was created successfully and has the id: **${suggestion!.id}**`);
+                    return;
                 }
                 case "show": {
-                    if (msg.member && !msg.member.permission.has(suggestionModPermission))
-                        return await msg.channel.createMessage("You are not allowed to use this command");
-                    if (args.length < 1)
-                        return await msg.channel.createMessage("You have to add the id of the suggestion you want to see, alternatively use list to get a list of suggestions");
+                    if (msg.member && !msg.member.permission.has(suggestionPermission)) {
+                        await msg.channel.createMessage("You are not allowed to use this command");
+                        return;
+                    }
+
+                    if (args.length < 1) {
+                        await msg.channel.createMessage("You have to add the id of the suggestion you want to see, alternatively use list to get a list of suggestions");
+                        return;
+                    }
 
                     let id = 0;
                     try {
                         id = parseNumber(args[0]);
                     } catch (e) {
-                        return await msg.channel.createMessage("Please use a numeric id.");
+                        await msg.channel.createMessage("Please use a numeric id");
+                        return;
                     }
 
-                    const suggestion = await suggestionController.getSuggestion(channel.guild.id, id);
-                    if (!suggestion)
-                        return await msg.channel.createMessage(`Suggestion with id ${id} could not be found`);
+                    const suggestion = await controller.getSuggestion(id);
+                    if (!suggestion) {
+                        await msg.channel.createMessage(`Suggestion with id ${id} could not be found`);
+                        return;
+                    }
 
-                    return await msg.channel.createMessage({ embed: createSuggestionEmbed(suggestion) });
+                    await msg.channel.createMessage({ embed: createSuggestionEmbed(suggestion) });
+                    return;
                 }
                 case "list": {
-                    if (msg.member && !msg.member.permission.has(suggestionModPermission))
-                        return await msg.channel.createMessage("You are not allowed to use this command");
+                    if (msg.member && !msg.member.permission.has(suggestionPermission)) {
+                        await msg.channel.createMessage("You are not allowed to use this command");
+                        return;
+                    }
 
                     let page = 1;
                     if (args.length === 1) {
@@ -180,20 +209,32 @@ export default class Suggestion extends Command {
                         }
                     }
 
-                    const maxPage = await suggestionController.maxSuggestionPage(channel.guild.id);
-                    if (page > maxPage!) return await msg.channel.createMessage("This page does not exist.");
+                    const maxPage = await controller.maxSuggestionPage();
+                    if (page > maxPage) {
+                        await msg.channel.createMessage("This page does not exist");
+                        return;
+                    }
 
-                    const suggestions = await suggestionController.listSuggestion(channel.guild.id, page);
-                    return await msg.channel.createMessage({ embed: createSuggestionListEmbed(suggestions, page, maxPage!) });
+                    const suggestions = await controller.listSuggestion(page);
+                    await msg.channel.createMessage({ embed: createSuggestionListEmbed(suggestions, page, maxPage) });
+                    return;
                 }
                 case "accept": {
-                    return await acceptOrDenySuggestion(msg, database, args, "accept", client);
+                    return await acceptOrDenySuggestion(client, msg, args, "accept");
                 }
                 case "deny": {
-                    return await acceptOrDenySuggestion(msg, database, args, "deny", client);
+                    return await acceptOrDenySuggestion(client, msg, args, "deny");
                 }
                 default:
-                    return await msg.channel.createMessage("**Commands**\nYou can either **create** a sugestion\nGet a **list** of the newest suggestions\n**View** a suggestion by **id**\n**Accept** a suggestion by **id**\n**Deny** a suggestion by **id**");
+                    await msg.channel.createMessage(
+                        "**Commands**\n" +
+                            "You can either **create** a sugestion\n" +
+                            "Get a **list** of the newest suggestions\n" +
+                            "**View** a suggestion by **id**\n" +
+                            "**Accept** a suggestion by **id**\n" +
+                            "**Deny** a suggestion by **id**"
+                    );
+                    return;
             }
         } else {
             await msg.channel.createMessage(`Missing argument for action **${action}**`);

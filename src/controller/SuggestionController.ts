@@ -1,117 +1,69 @@
-import Mashu from "../structures/MashuClient";
-import { GuildModel, IGuildModel } from "../structures/Mongoose";
-import { ISuggestion } from "../interfaces/Guild";
+import settings from "~/settings";
+import Mashu from "~/utils/MashuClient";
+import Suggestions from "~/models/Suggestions";
+import { ISuggestion, SuggestionDoc } from "~/types/mongo/Suggestions";
 import { User } from "eris";
+import { getNextSequenceValue } from "~/utils/Utils";
 
 export default class SuggestionController {
     /** Create a new Suggestion */
-    public async createSuggestion(content: string, creator: User, guildId: string, notificationId: string): Promise<ISuggestion | undefined> {
-        const guild = await GuildModel.findOne({ "id": guildId }).exec();
-
-        if (guild) {
-            const currentAmount = guild.suggestions.length;
-            const suggestion: ISuggestion = {
-                id: currentAmount + 1,
-                creator: `${creator.username}#${creator.discriminator}`,
-                creatorId: creator.id,
-                content,
-                notificationId
-            };
-
-            guild.suggestions.push(suggestion);
-            await guild.save();
-
-            return await this.getSuggestion(guildId, suggestion.id);
-        } else {
-            return void 0;
-        }
+    async createSuggestion(content: string, creator: User, notificationId: string): Promise<SuggestionDoc> {
+        return Suggestions.create({
+            sid: await getNextSequenceValue("suggestionId"),
+            creator: creator.tag,
+            creatorId: creator.id,
+            content,
+            notificationId
+        });
     }
 
-    /** Get a suggestion via id */
-    public async getSuggestion(guildId: string, id: number): Promise<ISuggestion | undefined> {
-        const guild = await GuildModel.findOne({ "id": guildId }).exec();
-        if (guild) {
-            return guild.suggestions.find((s) => s.id === id);
-        } else {
-            return void 0;
-        }
+    /** Get suggestion by id */
+    async getSuggestion(id: number): Promise<ISuggestion | null> {
+        return Suggestions.findOne({ id }).exec();
     }
 
     /** Accept a suggestion */
-    public async acceptSuggestion(guildId: string, id: number, moderator: User, client: Mashu): Promise<ISuggestion | undefined> {
-        const guild = await GuildModel.findOne({ "id": guildId }).exec();
-        if (guild) {
-            const accepted = await this.updateSuggestionState(guild, id, moderator, "accepted");
-            if (accepted) {
-                if (guild.notifyCreator) {
-                    const dm = await client.getDMChannel(accepted.creatorId);
-                    dm.createMessage(`Hello ${accepted.creator},\nYour suggestion has been accepted!\n\`\`\`${accepted.content}\`\`\``);
-                }
-                return accepted;
-            } else {
-                return void 0;
+    async acceptSuggestion(client: Mashu, moderator: User, sid: number): Promise<ISuggestion | undefined> {
+        const accepted = await this.updateSuggestionState(moderator, sid, "accepted");
+        if (accepted) {
+            if (settings.options.notifyCreator) {
+                const dm = await client.getDMChannel(accepted.creatorId);
+                dm.createMessage(`Hello ${accepted.creator},\nYour suggestion has been accepted!\n\`\`\`${accepted.content}\`\`\``).catch(() => {});
             }
-        } else {
-            return void 0;
+            return accepted;
         }
     }
 
     /** Decline a suggestion */
-    public async declineSuggestion(guildId: string, id: number, moderator: User, client: Mashu): Promise<ISuggestion | undefined> {
-        const guild = await GuildModel.findOne({ "id": guildId }).exec();
-        if (guild) {
-            const denied = await this.updateSuggestionState(guild, id, moderator, "denied");
-            if (denied) {
-                if (guild.notifyCreator) {
-                    const dm = await client.getDMChannel(denied.creatorId);
-                    dm.createMessage(`Hello ${denied.creator},\nYour suggestion has been denied.\n\`\`\`${denied.content}\`\`\`\n`);
-                }
-                return denied;
-            } else {
-                return void 0;
+    async declineSuggestion(client: Mashu, moderator: User, sid: number): Promise<ISuggestion | undefined> {
+        const denied = await this.updateSuggestionState(moderator, sid, "denied");
+        if (denied) {
+            if (settings.options.notifyCreator) {
+                const dm = await client.getDMChannel(denied.creatorId);
+                dm.createMessage(`Hello ${denied.creator},\nYour suggestion has been denied.\n\`\`\`${denied.content}\`\`\`\n`);
             }
-        } else {
-            return void 0;
+            return denied;
         }
     }
 
     /** Updates the state and the moderator of a suggestion */
-    public async updateSuggestionState(guild: IGuildModel, id: number, moderator: User, state: string): Promise<ISuggestion | undefined> {
-        guild.suggestions.map((s) => {
-            if (s.id === id) {
-                s.modId = moderator.id;
-                s.moderator = `${moderator.username}#${moderator.discriminator}`;
-                s.state = state;
-            }
-            return s;
-        });
-        await guild.save();
-        return await this.getSuggestion(guild.id, id);
+    async updateSuggestionState(moderator: User, sid: number, state: "accepted" | "denied"): Promise<ISuggestion | null> {
+        return Suggestions.findOneAndUpdate({ sid, modId: moderator.id }, { state }).exec();
     }
 
     /** Get a list of suggestions paginated in 10 result batches */
-    public async listSuggestion(guildId: string, page = 0): Promise<ISuggestion[]> {
-        const guild = await GuildModel.findOne({ "id": guildId }).exec();
-        if (guild) {
-            return Array.from(guild.suggestions).paginate(4, page);
+    async listSuggestion(page = 0): Promise<ISuggestion[]> {
+        const suggestions = await Suggestions.find({}).exec();
+        if (suggestions) {
+            return suggestions.paginate(4, page);
         } else {
             return [];
         }
     }
 
-    /**
-     * Get the amount of pages that are currently available
-     *
-     * @param {string} guildId - The id of the guild the suggestion was created in
-     * @returns {Promise}
-     */
-    public async maxSuggestionPage(guildId: string): Promise<number | undefined> {
-        const guild = await GuildModel.findOne({ "id": guildId }).exec();
-        if (guild) {
-            const suggestionCount = guild.suggestions.length;
-            return Math.ceil(suggestionCount / 4);
-        } else {
-            return void 0;
-        }
+    /** Get the amount of pages that are currently available */
+    async maxSuggestionPage(): Promise<number> {
+        const suggestionCount = await Suggestions.countDocuments().exec();
+        return Math.ceil(suggestionCount / 4);
     }
 }

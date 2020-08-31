@@ -1,9 +1,9 @@
-import Command from "../../Command";
+import Command from "~/Command";
 import { exec } from "child_process";
 import { Message } from "eris";
 
 export default class Exec extends Command {
-    public constructor(category: string) {
+    constructor(category: string) {
         super({
             name: "exec",
             description: "Execute shell shit",
@@ -15,7 +15,7 @@ export default class Exec extends Command {
         });
     }
 
-    public async run(msg: Message, args: string[]): Promise<void> {
+    async run(msg: Message, args: string[]): Promise<void> {
         exec(args.join(" "), { maxBuffer: Infinity }, async (err, stdout, stderr) => {
             try {
                 if (err) return await msg.channel.createMessage(`\`\`\`fix\n${err}\n\`\`\``);
