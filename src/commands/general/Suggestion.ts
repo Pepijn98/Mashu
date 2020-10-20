@@ -11,8 +11,8 @@ const suggestionPermission = "manageGuild";
 const controller = new SuggestionController();
 
 const colorMap: Record<string, number> = {
-    accepted: 0x65c875,
-    denied: 0xee5168
+    accepted: settings.colors.accepted,
+    denied: settings.colors.denied
 };
 
 function createSuggestionEmbed(suggestion: ISuggestion, created = false): EmbedOptions {
@@ -41,7 +41,7 @@ function createSuggestionEmbed(suggestion: ISuggestion, created = false): EmbedO
 
     return {
         title: `${created ? "New " : ""}Suggestion by ${suggestion.creator}(${suggestion.creatorId})`,
-        color: colorMap[suggestion.state] || 0x01d6f4,
+        color: colorMap[suggestion.state] || settings.colors.default,
         fields
     };
 }

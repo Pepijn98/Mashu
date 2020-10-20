@@ -7,6 +7,8 @@ export interface IColors {
     kick: number;
     mute: number;
     unmute: number;
+    accepted: number;
+    denied: number;
 }
 
 export interface IDatabase {
