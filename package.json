@@ -1,6 +1,6 @@
 {
     "name": "mashu",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Private moderation bot",
     "engines": {
         "node": ">=14",
@@ -27,7 +27,6 @@
         "deploy": "pm2 start ecosystem.config.js --env production",
         "start": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register src/index.ts",
         "test": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/index.ts",
-        "api": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register test.ts",
         "pretest": "yarn pretty",
         "prebuild": "rm -rf dist",
         "build": "tsc",

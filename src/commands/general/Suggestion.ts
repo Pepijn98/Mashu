@@ -7,8 +7,13 @@ import { ISuggestion } from "~/types/mongo/Suggestions";
 import { isGuildChannel } from "~/utils/Utils";
 import { Message, TextChannel, EmbedField, EmbedOptions } from "eris";
 
-const suggestionPermission = "manageMessages";
+const suggestionPermission = "manageGuild";
 const controller = new SuggestionController();
+
+const colorMap: Record<string, number> = {
+    accepted: 0x65c875,
+    denied: 0xee5168
+};
 
 function createSuggestionEmbed(suggestion: ISuggestion, created = false): EmbedOptions {
     const fields: EmbedField[] = [
@@ -36,7 +41,7 @@ function createSuggestionEmbed(suggestion: ISuggestion, created = false): EmbedO
 
     return {
         title: `${created ? "New " : ""}Suggestion by ${suggestion.creator}(${suggestion.creatorId})`,
-        color: 120564,
+        color: colorMap[suggestion.state] || 0x01d6f4,
         fields
     };
 }
@@ -72,7 +77,7 @@ function parseNumber(number: string): number {
 
 async function acceptOrDenySuggestion(client: Mashu, msg: Message, args: string[], type: "accept" | "deny"): Promise<void> {
     if (msg.member && !msg.member.permission.has(suggestionPermission)) {
-        await msg.channel.createMessage("Only mods with the permission `manageMessages` can use this command");
+        await msg.channel.createMessage(`Only mods with the permission \`${suggestionPermission}\` can use this command`);
         return;
     }
 
@@ -110,7 +115,7 @@ async function acceptOrDenySuggestion(client: Mashu, msg: Message, args: string[
 
         const notificationChannel = msg.channel.guild.channels.get(settings.options.suggestionChannel) as TextChannel;
         if (notificationChannel && suggestion) {
-            const notificationMessage = await notificationChannel.getMessage(suggestion.notificationId);
+            const notificationMessage = await notificationChannel.getMessage(suggestion.messageId);
             if (notificationMessage) {
                 await notificationMessage.edit({ content: "", embed: createSuggestionEmbed(suggestion) });
             }
@@ -163,7 +168,9 @@ export default class Suggestion extends Command {
                     const notificationMessage = await client.createMessage(settings.options.suggestionChannel, `New Suggestion by ${msg.author.tag}`);
                     const suggestion = await controller.createSuggestion(content, msg.author, notificationMessage.id);
                     await notificationMessage.edit({ content: "", embed: createSuggestionEmbed(suggestion!, true) });
-                    await msg.channel.createMessage(`Your suggestion was created successfully and has the id: **${suggestion!.id}**`);
+                    await notificationMessage.addReaction("👍");
+                    await notificationMessage.addReaction("👎");
+                    await msg.channel.createMessage(`Your suggestion was created successfully and has the id: **${suggestion!.sid}**`);
                     return;
                 }
                 case "show": {

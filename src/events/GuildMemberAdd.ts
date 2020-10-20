@@ -1,10 +1,10 @@
 import Users from "~/models/Users";
 import settings from "~/settings";
+import Event from "~/types/IEvent";
 import { Guild, Member } from "eris";
-import { IEvent } from "~/types/IEvent";
 
 /** Handle muted members trying to re-join the server */
-export const event: IEvent = {
+export const event: Event = {
     name: "guildMemberAdd",
     run: async (client, guild: Guild, member: Member) => {
         if (guild.id !== settings.options.guild) return;
@@ -29,3 +29,5 @@ export const event: IEvent = {
         }
     }
 };
+
+export default event;

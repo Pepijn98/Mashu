@@ -17,7 +17,7 @@ export class MessageCollector extends EventEmitter {
         super();
         this.filter = filter;
         this.channel = channel;
-        this.options = options || {};
+        this.options = options;
         this.ended = false;
         this.collected = [];
         this.bot = channel.isGuildChannel && (channel as AnyGuildChannel).guild ? (channel as AnyGuildChannel).guild.shard.client : (channel as any)._client;

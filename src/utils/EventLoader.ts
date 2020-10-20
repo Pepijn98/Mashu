@@ -18,7 +18,7 @@ export default class EventLoader {
         const files = await fs.readdir(dir);
         for (const file of files) {
             if (/\.(t|j)s$/iu.test(file)) {
-                const event = new (await import(path.join(dir, file))).default() as Event;
+                const event = (await import(path.join(dir, file))).default as Event;
                 this.#logger.info("EVENTS", `Loaded even ${event.name}`);
                 this.#client.on(event.name, (...args: any[]) => event.run(this.#client, ...args));
             }

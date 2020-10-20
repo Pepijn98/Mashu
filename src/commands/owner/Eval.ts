@@ -76,7 +76,9 @@ export default class extends Command {
         try {
             outputMsg = await msg.channel.createMessage(message);
         } catch (error) {
-            msg.channel.createMessage(`\`\`\`diff\n- ${error}\`\`\``).catch(() => {});
+            msg.channel.createMessage(`\`\`\`diff\n- ${error}\`\`\``).catch(() => {
+                return;
+            });
             return;
         }
 
@@ -94,7 +96,9 @@ export default class extends Command {
                 await outputMsg.edit(newContent.join("\n"));
             } catch (_) {
                 newContent.splice(-2, 1, "(content too long)");
-                outputMsg.edit(newContent.join("\n")).catch(() => {});
+                outputMsg.edit(newContent.join("\n")).catch(() => {
+                    return;
+                });
             }
         }
     }

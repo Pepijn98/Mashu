@@ -7,19 +7,19 @@ import { getNextSequenceValue } from "~/utils/Utils";
 
 export default class SuggestionController {
     /** Create a new Suggestion */
-    async createSuggestion(content: string, creator: User, notificationId: string): Promise<SuggestionDoc> {
+    async createSuggestion(content: string, creator: User, messageId: string): Promise<SuggestionDoc> {
         return Suggestions.create({
             sid: await getNextSequenceValue("suggestionId"),
             creator: creator.tag,
             creatorId: creator.id,
             content,
-            notificationId
+            messageId
         });
     }
 
     /** Get suggestion by id */
-    async getSuggestion(id: number): Promise<ISuggestion | null> {
-        return Suggestions.findOne({ id }).exec();
+    async getSuggestion(sid: number): Promise<ISuggestion | null> {
+        return Suggestions.findOne({ sid }).exec();
     }
 
     /** Accept a suggestion */
@@ -28,7 +28,9 @@ export default class SuggestionController {
         if (accepted) {
             if (settings.options.notifyCreator) {
                 const dm = await client.getDMChannel(accepted.creatorId);
-                dm.createMessage(`Hello ${accepted.creator},\nYour suggestion has been accepted!\n\`\`\`${accepted.content}\`\`\``).catch(() => {});
+                dm.createMessage(`Hello ${accepted.creator},\nYour suggestion has been accepted!\n\`\`\`${accepted.content}\`\`\``).catch(() => {
+                    return;
+                });
             }
             return accepted;
         }
@@ -48,7 +50,7 @@ export default class SuggestionController {
 
     /** Updates the state and the moderator of a suggestion */
     async updateSuggestionState(moderator: User, sid: number, state: "accepted" | "denied"): Promise<ISuggestion | null> {
-        return Suggestions.findOneAndUpdate({ sid, modId: moderator.id }, { state }).exec();
+        return Suggestions.findOneAndUpdate({ sid }, { state, modId: moderator.id, moderator: moderator.tag }).exec();
     }
 
     /** Get a list of suggestions paginated in 10 result batches */

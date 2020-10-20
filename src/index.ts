@@ -65,7 +65,8 @@ client.on("ready", async () => {
         // Connect to mongodb
         await mongoose.connect(`mongodb://${settings.database.user}:${settings.database.pwd}@${settings.database.host}:${settings.database.port}/${settings.database.name}`, {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useFindAndModify: false
         });
 
         // Load commands

@@ -5,7 +5,7 @@ export interface ISuggestion {
     creator: string;
     creatorId: string;
     content: string;
-    notificationId: string;
+    messageId: string;
     moderator?: string;
     modId?: string;
     state?: string;

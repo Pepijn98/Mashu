@@ -4,7 +4,7 @@
         "node": true
     },
     "parserOptions": {
-        "ecmaVersion": 10,
+        "ecmaVersion": 2020,
         "parser": "@typescript-eslint/parser"
     },
     "plugins": [
@@ -21,9 +21,7 @@
         "@typescript-eslint/explicit-function-return-type": ["error", {
             "allowExpressions": true
         }],
-        "@typescript-eslint/explicit-member-accessibility": "off",
         "@typescript-eslint/interface-name-prefix": "off",
-        "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
 
@@ -39,16 +37,5 @@
         "semi": ["error", "always"],
         "semi-spacing": "error",
         "semi-style": ["error", "last"]
-    },
-    "overrides": [
-        {
-            // enable the rule specifically for TypeScript files
-            "files": ["*.ts", "*.tsx"],
-            "rules": {
-                "@typescript-eslint/explicit-member-accessibility": ["error", {
-                    "accessibility": "no-public"
-                }]
-            }
-        }
-    ]
+    }
 }

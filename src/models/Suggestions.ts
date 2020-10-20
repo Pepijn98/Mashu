@@ -9,7 +9,7 @@ export const Suggestion = new Schema<SuggestionDoc>({
     modId: String,
     state: { default: "created", type: String },
     content: String,
-    notificationId: String
+    messageId: String
 });
 
 export const Suggestions = model<SuggestionDoc>("Suggestions", Suggestion);
