@@ -134,6 +134,10 @@ process.on("unhandledRejection", (reason) => {
     logger.error("UNHANDLED_REJECTION", reason as any);
 });
 
+process.on("uncaughtException", (e) => {
+    logger.error("UNCAUGHT_EXCEPTION", e);
+});
+
 process.on("SIGINT", () => {
     if (interval.active) {
         interval.stop();
