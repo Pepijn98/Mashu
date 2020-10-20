@@ -27,6 +27,3 @@ If at least one of these don't apply to you and you don't know how to get it ple
 | `warn` | Warn a user from the current guild | Moderation |
 | `eval` | Evaluate javascript code | Owner |
 | `exec` | Execute shell shit | Owner |
-
-## Support
-[![discord](https://discord.com/api/guilds/240059867744698368/widget.png?style=banner2)](https://discord.gg/p895czC)
