@@ -22,8 +22,11 @@ export interface IDatabase {
 export interface IOptions {
     guild: string;
     muteRole: string;
+    memberRole: string;
     logChannel: string;
     suggestionChannel: string;
+    memberCountChannel: string;
+    welcomeChannel: string;
     notifyCreator: boolean;
 }
 

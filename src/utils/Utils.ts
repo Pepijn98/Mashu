@@ -1,5 +1,9 @@
-import { Channel, GuildChannel, PrivateChannel } from "eris";
 import Counters from "~/models/Counters";
+import settings from "~/settings";
+import Mashu from "./MashuClient";
+import { Channel, Guild, GuildChannel, PrivateChannel, TextChannel } from "eris";
+
+export const urlRegex = /[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/gui;
 
 /** Wait x amount of milliseconds */
 export const sleep = (ms: number): Promise<unknown> => new Promise((r) => setTimeout(r, ms));
@@ -7,6 +11,11 @@ export const sleep = (ms: number): Promise<unknown> => new Promise((r) => setTim
 /** Check whether channel is guild channel */
 export const isGuildChannel = (channel: Channel): channel is GuildChannel => {
     if (channel instanceof GuildChannel) return true;
+    return false;
+};
+
+export const isGuildTextChannel = (channel: Channel): channel is TextChannel => {
+    if (channel instanceof TextChannel) return true;
     return false;
 };
 
@@ -40,4 +49,19 @@ export const getNextSequenceValue = async (name: string): Promise<number> => {
         return sequence.sequence_value;
     }
     throw Error(`No counter found with name ${name}`);
+};
+
+export const updateMemberCount = async (client: Mashu, guild: Guild): Promise<void> => {
+    if (!settings.options.memberCountChannel) return;
+    const channel = guild.channels.get(settings.options.memberCountChannel);
+    if (channel) {
+        try {
+            await channel.edit({
+                name: `🐺 Members - ${guild.memberCount}`
+            });
+            // client.logger.info("MEMBER_COUNT", guild.memberCount.toString());
+        } catch (e) {
+            client.logger.error("MEMBER_COUNT", e);
+        }
+    }
 };

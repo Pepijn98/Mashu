@@ -11,6 +11,7 @@ import CommandLoader from "./utils/CommandLoader";
 import EventLoader from "./utils/EventLoader";
 import Logger from "./utils/Logger";
 import Users from "./models/Users";
+import { updateMemberCount } from "./utils/Utils";
 
 // Whether the bot is ready or not
 let ready = false;
@@ -78,18 +79,19 @@ client.on("ready", async () => {
         logger.ready(`Logged in as ${client.user.tag}`);
         logger.ready(`Loaded [${client.commands.size}] commands`);
 
+        client.editStatus("online", { name: "my master", type: 3 });
+
         ready = true;
+
+        const guild = client.guilds.get(settings.options.guild);
+        if (guild) {
+            await updateMemberCount(client, guild);
+        }
     } else {
         // Start db interval if none is active
         if (!interval.active) startDBInterval();
         logger.ready("Client reconnected");
     }
-});
-
-// Handle disconnects
-client.on("disconnect", () => {
-    logger.warn("DISCONNECT", "Client disconnected");
-    interval.stop();
 });
 
 // Handle commands
@@ -111,6 +113,23 @@ client.on("messageCreate", async (msg) => {
     }
 });
 
+// Handle disconnects
+client.on("disconnect", () => {
+    logger.warn("DISCONNECT", "Client disconnected");
+    interval.stop();
+});
+
+/**
+ * Sometimes when a shard goes down for a moment and comes back up is loses it's status
+ * so we re-add it here
+ */
+client.on("shardResume", (id: number) => {
+    const shard = client.shards.get(id);
+    if (shard) {
+        shard.editStatus("online", { name: "my master", type: 3 });
+    }
+});
+
 process.on("unhandledRejection", (reason) => {
     logger.error("UNHANDLED_REJECTION", reason as any);
 });
@@ -125,7 +144,7 @@ process.on("SIGINT", () => {
 
 async function main(): Promise<void> {
     await eventLoader.load(path.join(__dirname, "events"));
-    client.connect().catch((e) => logger.error("CONNECT", e.stack));
+    client.connect().catch((e) => logger.error("CONNECT", e));
 }
 
 main().catch((e) => logger.error("MAIN", e));
