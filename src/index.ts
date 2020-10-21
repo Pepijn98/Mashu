@@ -11,7 +11,7 @@ import CommandLoader from "./utils/CommandLoader";
 import EventLoader from "./utils/EventLoader";
 import Logger from "./utils/Logger";
 import Users from "./models/Users";
-import { updateMemberCount } from "./utils/Utils";
+import { isGuildTextChannel, isGuildVoiceChannel, updateMemberCount, textMute, voiceMute } from "./utils/Utils";
 
 // Whether the bot is ready or not
 let ready = false;
@@ -60,6 +60,19 @@ function startDBInterval(): void {
         }
     }, 1 * 60 * 1000); // Every minute
 }
+
+// TODO : Move to ~/events/ChannelCreate.ts
+client.on("channelCreate", async (channel) => {
+    if (isGuildTextChannel(channel)) {
+        logger.debug("CHANNEL_CREATE", `(${channel.name}) [${textMute}] | Add mute overrides to new channel`);
+        await channel.editPermission(settings.options.muteRole, null, textMute, "role", "Add mute overrides to new channel");
+    }
+
+    if (isGuildVoiceChannel(channel)) {
+        logger.debug("CHANNEL_CREATE", `(${channel.name}) [${voiceMute}] | Add mute overrides to new channel`);
+        await channel.editPermission(settings.options.muteRole, null, voiceMute, "role", "Add mute overrides to new channel");
+    }
+});
 
 client.on("ready", async () => {
     if (!ready) {

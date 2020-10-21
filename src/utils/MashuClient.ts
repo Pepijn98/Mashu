@@ -9,7 +9,7 @@ import { Client, Message, Emoji, ClientOptions } from "eris";
 export default class Mashu extends Client {
     logger: Logger;
     commands: Collection<Command>;
-    activeMessages: Record<string | number | symbol, IActiveMessage>; // TODO: Maybe use a Collection for this
+    activeMessages: Record<string, IActiveMessage>; // TODO: Maybe use a Collection for this
     stats: ICommandStats;
     ready = false;
 

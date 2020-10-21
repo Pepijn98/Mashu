@@ -1,9 +1,15 @@
 import Counters from "~/models/Counters";
 import settings from "~/settings";
 import Mashu from "./MashuClient";
-import { Channel, Guild, GuildChannel, PrivateChannel, TextChannel } from "eris";
+import { Channel, Guild, GuildChannel, PrivateChannel, TextChannel, VoiceChannel, Constants } from "eris";
 
-export const urlRegex = /[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/gui;
+export const { Permissions } = Constants;
+
+export const textMute = Permissions.sendMessages | Permissions.sendTTSMessages | Permissions.embedLinks | Permissions.attachFiles | Permissions.addReactions;
+
+export const voiceMute = Permissions.voiceConnect | Permissions.voiceSpeak;
+
+export const urlRegex = /[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/giu;
 
 /** Wait x amount of milliseconds */
 export const sleep = (ms: number): Promise<unknown> => new Promise((r) => setTimeout(r, ms));
@@ -16,6 +22,11 @@ export const isGuildChannel = (channel: Channel): channel is GuildChannel => {
 
 export const isGuildTextChannel = (channel: Channel): channel is TextChannel => {
     if (channel instanceof TextChannel) return true;
+    return false;
+};
+
+export const isGuildVoiceChannel = (channel: Channel): channel is VoiceChannel => {
+    if (channel instanceof VoiceChannel) return true;
     return false;
 };
 
@@ -59,7 +70,7 @@ export const updateMemberCount = async (client: Mashu, guild: Guild): Promise<vo
             await channel.edit({
                 name: `🐺 Members - ${guild.memberCount}`
             });
-            // client.logger.info("MEMBER_COUNT", guild.memberCount.toString());
+            client.logger.debug("MEMBER_COUNT", guild.memberCount.toString());
         } catch (e) {
             client.logger.error("MEMBER_COUNT", e);
         }

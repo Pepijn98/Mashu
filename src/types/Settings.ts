@@ -1,3 +1,5 @@
+export type NodeEnv = "production" | "development";
+
 export interface IColors {
     default: number;
     error: number;
@@ -31,6 +33,8 @@ export interface IOptions {
 }
 
 export interface ISettings {
+    env: NodeEnv;
+    debug: boolean;
     token: string;
     owner: string;
     prefix: string;
@@ -38,3 +42,5 @@ export interface ISettings {
     database: IDatabase;
     options: IOptions;
 }
+
+export default ISettings;
