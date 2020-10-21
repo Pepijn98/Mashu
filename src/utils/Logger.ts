@@ -17,8 +17,8 @@ export default class Logger {
             ),
             transports: [
                 new transports.Console({
-                    level: "info",
-                    handleExceptions: true
+                    level: "info"//,
+                    // handleExceptions: true
                 })
             ]
         });

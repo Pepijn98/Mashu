@@ -58,7 +58,7 @@ function startDBInterval(): void {
                 }
             }
         }
-    }, 60000); // Every minute
+    }, 1 * 60 * 1000); // Every minute
 }
 
 client.on("ready", async () => {
