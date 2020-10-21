@@ -41,7 +41,7 @@ function createSuggestionEmbed(suggestion: ISuggestion, created = false): EmbedO
 
     return {
         title: `${created ? "New " : ""}Suggestion by ${suggestion.creator}(${suggestion.creatorId})`,
-        color: colorMap[suggestion.state] || settings.colors.default,
+        color: colorMap[suggestion.state || "created"] || settings.colors.default,
         fields
     };
 }

@@ -1,6 +1,6 @@
 {
     "name": "mashu",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "Private moderation bot",
     "engines": {
         "node": ">=14",
@@ -25,11 +25,12 @@
     "scripts": {
         "deploy": "pm2 start ecosystem.config.js --env production",
         "start": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register src/index.ts",
-        "test": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/index.ts",
+        "dev": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/index.ts",
         "debug": "cross-env DEBUG=true NODE_ENV=development ts-node -r tsconfig-paths/register src/index.ts",
         "pretest": "yarn pretty",
         "prebuild": "rm -rf dist",
         "build": "tsc",
+        "test": "tsc --noEmit",
         "clean": "rm -rf ./node_modules ./yarn.lock ./package-lock.json",
         "format": "prettier --write \"src/**/*.{ts,js}\" \"./*.{ts,js}\"",
         "lint": "eslint \"src/**/*.{ts,js}\" \"./*.{ts,js}\" --fix",
