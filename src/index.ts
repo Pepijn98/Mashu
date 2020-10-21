@@ -19,7 +19,14 @@ let ready = false;
 const logger = new Logger();
 
 // Initialize discord client
-const client = new Mashu(logger, settings.token, { getAllUsers: true, restMode: true });
+const client = new Mashu(logger, settings.token, {
+    autoreconnect: true,
+    compress: true,
+    getAllUsers: true,
+    restMode: true,
+    defaultImageFormat: "webp",
+    defaultImageSize: 2048
+});
 
 // Initialize command loader/handler and event loader
 const commandLoader = new CommandLoader(client);
@@ -113,6 +120,14 @@ client.on("messageCreate", async (msg) => {
     }
 });
 
+client.on("error", (e: any) => {
+    if (e.code === 1001) {
+        client.disconnect({ reconnect: true });
+        // client.disconnect({ reconnect: false });
+        // client.connect().catch((e) => logger.error("CONNECT", e));
+    }
+});
+
 // Handle disconnects
 client.on("disconnect", () => {
     logger.warn("DISCONNECT", "Client disconnected");
@@ -134,7 +149,7 @@ process.on("unhandledRejection", (reason) => {
     logger.error("UNHANDLED_REJECTION", reason as any);
 });
 
-process.on("uncaughtException", (e) => {
+process.on("uncaughtException", (e: any) => {
     logger.error("UNCAUGHT_EXCEPTION", e);
 });
 
