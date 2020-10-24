@@ -1,9 +1,10 @@
 import Users from "./models/Users";
+import { Message, Member, GuildChannel } from "eris";
 import { ICommandOptions } from "./types/CommandOptions";
 import { ICommandContext } from "./types/ICommandContext";
-import { Message, Member, GuildChannel } from "eris";
 import { MongooseArray } from "./types/mongo/Utils";
 import { IUser, UserDoc } from "./types/mongo/Users";
+import { Permission } from "~/utils/Utils";
 
 export default abstract class Command {
     _key: string; // Collection id
@@ -19,8 +20,8 @@ export default abstract class Command {
     guildOnly: boolean;
     ownerOnly: boolean;
     requiredArgs: number;
-    userPermissions: string[];
-    botPermissions: string[];
+    userPermissions: Permission[];
+    botPermissions: Permission[];
 
     constructor(options: ICommandOptions) {
         this._key = options.name;

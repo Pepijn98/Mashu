@@ -1,0 +1,76 @@
+import Command from "~/Command";
+import { Message } from "eris";
+import { ICommandContext } from "~/types/ICommandContext";
+import { isGuildChannel } from "~/utils/Utils";
+
+export default class Prune extends Command {
+    constructor(category: string) {
+        super({
+            name: "prune",
+            description: "",
+            usage: "",
+            example: "",
+            category,
+            guildOnly: true,
+            requiredArgs: 2,
+            userPermissions: ["sendMessages", "manageMessages"],
+            botPermissions: ["readMessages", "sendMessages", "manageMessages"]
+        });
+    }
+
+    async run(msg: Message, args: string[], { client }: ICommandContext): Promise<void> {
+        if (!isGuildChannel(msg.channel)) return;
+
+        if (args[1]) {
+            await msg.delete();
+            const filterList = ["bots", "images", "files", "embeds", "includes", "contains", "links", "users", "from", "matches"];
+            const filtersActive = {};
+            const filters = args[1].split(",").map((filter) => filter.toLowerCase().trim());
+            for (const filter of filters) {
+                const filterName = !~filter.indexOf(" ") ? filter : filter.split(" ")[0];
+                if (!filterList.includes(filterName)) {
+                    delete filters[filters.indexOf(filter)];
+                    continue;
+                }
+
+                if (filterName === "from" || filterName === "users") {
+                    const users = filter.substring(filterName.length).trim().split(" ");
+                    for (const i = 0; i < users.length; i++) {
+                        try {
+                            users[i] = (await client.utils.resolver.user(msg, users[i])).id;
+                        } catch (err) {
+                            const m = await msg.channel.createMessage(`${err.message} (user #${i})`);
+                            setTimeout(() => m.delete(), 3000);
+                            return;
+                        }
+                    }
+                    filtersActive.users = users;
+                } else if (filterName === "includes" || filterName === "contains") {
+                    filtersActive.includes = filter.substring(filterName.length).trim();
+                } else if (filterName === "matches") {
+                    filtersActive.matches = filter.substring(filterName.length).trim();
+                } else {
+                    filtersActive[filterName] = true;
+                }
+            }
+
+            await msg.channel.purge(args[0], (msg) => {
+                if (filtersActive.bots && msg.author.client) return true;
+                else if (filtersActive.images && msg.attachments[0] && msg.attachments[0].width) return true;
+                else if (filtersActive.files && msg.attachments[0] && !msg.attachments[0].width) return true;
+                else if (filtersActive.embeds && msg.embeds.length >= 1) return true;
+                else if (filtersActive.users && filtersActive.users.includes(msg.author.id)) return true;
+                else if (filtersActive.includes && ~msg.content.toLowerCase().indexOf(filtersActive.includes)) return true;
+                else if (filtersActive.links && linkFilter.test(msg.content)) return true;
+                else if (filtersActive.matches && msg.content.match(new RegExp(filtersActive.matches, "im"))) return true;
+                else return false;
+            });
+        } else {
+            await msg.delete();
+            await msg.channel.purge(args[0]);
+        }
+
+        const m = await msg.channel.createMessage("👌");
+        setTimeout(() => m.delete(), 3000);
+    }
+}

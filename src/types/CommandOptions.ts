@@ -1,5 +1,6 @@
 import Collection from "@kurozero/collection";
 import { User } from "eris";
+import { Permission } from "~/utils/Utils";
 
 export interface ICommandOptions {
     name: string;
@@ -13,8 +14,8 @@ export interface ICommandOptions {
     guildOnly?: boolean | null;
     ownerOnly?: boolean | null;
     requiredArgs?: number | null;
-    userPermissions?: string[] | null;
-    botPermissions?: string[] | null;
+    userPermissions?: Permission[] | null;
+    botPermissions?: Permission[] | null;
 }
 
 export interface IMessageCollectorOptions {

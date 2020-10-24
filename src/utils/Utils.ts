@@ -3,7 +3,42 @@ import settings from "~/settings";
 import Mashu from "./MashuClient";
 import { Channel, Guild, GuildChannel, PrivateChannel, TextChannel, VoiceChannel, Constants } from "eris";
 
-export const { Permissions } = Constants;
+export type Permission =
+    | "createInstantInvite"
+    | "kickMembers"
+    | "banMembers"
+    | "administrator"
+    | "manageChannels"
+    | "manageGuild"
+    | "addReactions"
+    | "viewAuditLogs"
+    | "voicePrioritySpeaker"
+    | "stream"
+    | "readMessages"
+    | "sendMessages"
+    | "sendTTSMessages"
+    | "manageMessages"
+    | "embedLinks"
+    | "attachFiles"
+    | "readMessageHistory"
+    | "mentionEveryone"
+    | "externalEmojis"
+    | "viewGuildInsights"
+    | "voiceConnect"
+    | "voiceSpeak"
+    | "voiceMuteMembers"
+    | "voiceDeafenMembers"
+    | "voiceMoveMembers"
+    | "voiceUseVAD"
+    | "changeNickname"
+    | "manageNicknames"
+    | "manageRoles"
+    | "manageWebhooks"
+    | "manageEmojis";
+
+export type Permissions = Permission[];
+
+const { Permissions } = Constants;
 
 export const textMute = Permissions.sendMessages | Permissions.sendTTSMessages | Permissions.embedLinks | Permissions.attachFiles | Permissions.addReactions;
 
