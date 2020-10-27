@@ -22,7 +22,7 @@ const logger = new Logger();
 const client = new Mashu(logger, settings.token, {
     autoreconnect: true,
     compress: true,
-    getAllUsers: true,
+    // getAllUsers: true,
     restMode: true,
     defaultImageFormat: "webp",
     defaultImageSize: 2048
@@ -125,6 +125,8 @@ client.on("error", (e: any) => {
         client.disconnect({ reconnect: true });
         // client.disconnect({ reconnect: false });
         // client.connect().catch((e) => logger.error("CONNECT", e));
+    } else {
+        logger.error("ERROR", e);
     }
 });
 
