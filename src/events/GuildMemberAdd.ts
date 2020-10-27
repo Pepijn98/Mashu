@@ -19,6 +19,26 @@ async function advertDetection(guild: Guild, member: Member): Promise<void> {
     }
 }
 
+async function sendWelcome(client: Mashu, guild: Guild, member: Member): Promise<void> {
+    await client.createMessage(settings.options.welcomeChannel, {
+        content: member.mention,
+        embed: {
+            color: Math.floor(Math.random() * 16777215),
+            description: `Welcome to **${guild.name}**, make sure to read <#240154456577015808>`,
+            image: {
+                url: "https://b.catgirlsare.sexy/U-mh_8Ye.gif"
+            },
+            fields: [
+                {
+                    name: "Member Count",
+                    value: `#${guild.memberCount}`
+                }
+            ],
+            timestamp: new Date(member.joinedAt)
+        }
+    });
+}
+
 async function muteDetection(client: Mashu, member: Member): Promise<void> {
     if (settings.options.muteRole) {
         const user = await Users.findOne({ id: member.user.id }).exec();
@@ -50,6 +70,7 @@ export const event: Event = {
         if (hasUrlUsername) {
             await advertDetection(guild, member);
         } else {
+            await sendWelcome(client, guild, member);
             await member.addRole(settings.options.memberRole, "New member");
             await muteDetection(client, member);
             await updateMemberCount(client, guild);
