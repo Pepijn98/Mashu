@@ -11,7 +11,7 @@ import CommandLoader from "./utils/CommandLoader";
 import EventLoader from "./utils/EventLoader";
 import Logger from "./utils/Logger";
 import Users from "./models/Users";
-import { updateMemberCount } from "./utils/Utils";
+import { updateMemberCount, clientIntents } from "./utils/Utils";
 
 // Whether the bot is ready or not
 let ready = false;
@@ -22,10 +22,11 @@ const logger = new Logger();
 const client = new Mashu(logger, settings.token, {
     autoreconnect: true,
     compress: true,
-    // getAllUsers: true,
+    getAllUsers: true,
     restMode: true,
     defaultImageFormat: "webp",
-    defaultImageSize: 2048
+    defaultImageSize: 2048,
+    intents: clientIntents
 });
 
 // Initialize command loader/handler and event loader

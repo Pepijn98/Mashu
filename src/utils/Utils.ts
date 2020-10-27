@@ -38,11 +38,13 @@ export type Permission =
 
 export type Permissions = Permission[];
 
-const { Permissions } = Constants;
+const { Permissions, Intents } = Constants;
 
 export const textMute = Permissions.sendMessages | Permissions.sendTTSMessages | Permissions.embedLinks | Permissions.attachFiles | Permissions.addReactions;
 
 export const voiceMute = Permissions.voiceConnect | Permissions.voiceSpeak;
+
+export const clientIntents = Intents.guilds | Intents.guildMembers | Intents.guildBans | Intents.guildEmojis | Intents.guildMembers | Intents.guildMessageReactions | Intents.directMessages;
 
 export const urlRegex = /[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/giu;
 

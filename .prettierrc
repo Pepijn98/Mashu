@@ -1,6 +1,6 @@
 {
     "trailingComma": "none",
-    "printWidth": 180,
+    "printWidth": 200,
     "semi": true,
     "quoteProps": "consistent",
     "tabWidth": 4,
