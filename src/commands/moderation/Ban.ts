@@ -42,8 +42,8 @@ export default class Ban extends Command {
             if (!user) user = this.createDBUser(member.user.id);
 
             const timestamp = new Date().toISOString();
-            user.bans.create({ id: this.generateId(), timestamp, by: msg.author.id, reason });
-            // user.bans.push({ id: this.generateId(), timestamp, by: msg.author.id, reason: reason });
+            const entry = user.bans.create({ id: this.generateId(), timestamp, by: msg.author.id, reason });
+            user.bans.push(entry);
             user.isBanned = true;
 
             if (settings.options.logChannel) {

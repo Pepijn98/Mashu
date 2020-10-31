@@ -6,7 +6,7 @@ import { ICommandContext } from "~/types/ICommandContext";
 import { Message, Member } from "eris";
 import { isGuildChannel } from "~/utils/Utils";
 import { MongooseArray } from "~/types/mongo/Utils";
-import { INote, NoteDoc, UserDoc } from "~/types/mongo/Users";
+import { NoteDoc, UserDoc } from "~/types/mongo/Users";
 
 export default class Note extends Command {
     client!: Mashu;
@@ -81,11 +81,11 @@ export default class Note extends Command {
 
     /** Add new note to user */
     async addNote(msg: Message, noteMessage: string, user: UserDoc): Promise<void> {
-        const note: INote = { id: this.generateId(), timestamp: new Date().toISOString(), by: msg.author.id, message: noteMessage };
-        user.notes.create(note);
+        const entry = user.notes.create({ id: this.generateId(), timestamp: new Date().toISOString(), by: msg.author.id, message: noteMessage });
+        user.notes.push(entry);
 
         await user.save();
-        await msg.channel.createMessage(`New note added (id: ${note.id})`);
+        await msg.channel.createMessage(`New note added (id: ${entry.id})`);
     }
 
     /** Remove note form user by id */

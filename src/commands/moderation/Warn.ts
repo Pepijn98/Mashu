@@ -40,7 +40,8 @@ export default class Warn extends Command {
             if (!user) user = this.createDBUser(member.user.id);
 
             const timestamp = new Date().toISOString();
-            user.warns.create({ id: this.generateId(), timestamp, by: msg.author.id, reason });
+            const entry = user.warns.create({ id: this.generateId(), timestamp, by: msg.author.id, reason });
+            user.warns.push(entry);
 
             if (settings.options.logChannel) {
                 await client.createMessage(settings.options.logChannel, {
