@@ -10,7 +10,7 @@ export default class Unban extends Command {
         super({
             name: "unban",
             description: "Unban a user from the current guild",
-            usage: "unban <member: string> [reason: string]",
+            usage: "unban <name|id: string> [reason: string]",
             example: "unban Kurozero Has been banned for long enough",
             category: category,
             guildOnly: true,
@@ -26,14 +26,14 @@ export default class Unban extends Command {
             return;
         }
 
-        const userToUnban = args.shift() || "";
-        const reason = args.join(" ");
+        const userToUnban = (args.shift() || "").trim();
+        const reason = args.join(" ").trim();
 
         const bans = await msg.channel.guild.getBans();
-        const entry = bans.find((e) => e.user.username.toLowerCase().indexOf(userToUnban.toLowerCase()) > -1);
+        const entry = bans.find((e) => (/^\d{17,18}$/u).test(userToUnban) ? e.user.id === userToUnban : e.user.username.toLowerCase().includes(userToUnban.toLowerCase()));
 
         if (!entry) {
-            await msg.channel.createMessage("Couldn't find a user with that name on the ban list");
+            await msg.channel.createMessage("Couldn't find a user with that name or id on the ban list");
             return;
         }
 
