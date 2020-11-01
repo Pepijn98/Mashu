@@ -54,11 +54,11 @@ export default class Ban extends Command {
                     await msg.channel.createMessage("Couldn't DM the banned member");
                 }
             } else {
-                if ((/^\d{17,18}/u).test(userToBan)) {
+                if ((/^\d{17,18}/gui).test(userToBan)) {
                     await msg.channel.createMessage("Invalid user id");
                     return;
                 }
-                await client.banGuildMember(msg.channel.guild.id, "", 7, reason);
+                await client.banGuildMember(msg.channel.guild.id, userToBan, 7, reason);
             }
 
             let user = await Users.findOne({ id: member?.user?.id || userToBan }).exec();
