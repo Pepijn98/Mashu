@@ -21,15 +21,19 @@ export default class Ban extends Command {
         });
     }
 
-    async run(msg: Message, args: string[], { client }: ICommandContext): Promise<void> {
+    async run(msg: Message, args: string[], { client, logger }: ICommandContext): Promise<void> {
         if (!isGuildChannel(msg.channel)) {
             await msg.channel.createMessage("This can only be used in a guild");
             return;
         }
 
-        const userToBan = args.shift() || "";
+        const userToBan = (args.shift() || "").trim();
         const isMember = yn(args.shift(), false);
-        const reason = args.join(" ");
+        const reason = args.join(" ").trim();
+
+        logger.debug("USER_TO_BAN", userToBan);
+        logger.debug("IS_MEMBER", String(isMember));
+        logger.debug("REASON", reason);
 
         let member = null;
         try {
@@ -50,7 +54,8 @@ export default class Ban extends Command {
                     await msg.channel.createMessage("Couldn't DM the banned member");
                 }
             } else {
-                if ((/^\d{17,18}$/u).test(userToBan)) {
+                if ((/^\d{17,18}/u).test(userToBan)) {
+                    await msg.channel.createMessage("Invalid user id");
                     return;
                 }
                 await client.banGuildMember(msg.channel.guild.id, "", 7, reason);
