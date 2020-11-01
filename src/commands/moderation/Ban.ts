@@ -42,6 +42,13 @@ export default class Ban extends Command {
                 }
 
                 await member.ban(7, reason);
+
+                try {
+                    const dm = await member!.user.getDMChannel();
+                    await dm.createMessage(`You have been banned from: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
+                } catch (error) {
+                    await msg.channel.createMessage("Couldn't DM the banned member");
+                }
             } else {
                 if ((/^\d{17,18}$/u).test(userToBan)) {
                     return;
@@ -84,15 +91,6 @@ export default class Ban extends Command {
                 }
             });
             return;
-        }
-
-        if (isMember) {
-            try {
-                const dm = await member!.user.getDMChannel();
-                await dm.createMessage(`You have been banned from: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
-            } catch (error) {
-                await msg.channel.createMessage("Couldn't DM the banned member");
-            }
         }
     }
 }
