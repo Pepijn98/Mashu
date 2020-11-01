@@ -1,20 +1,21 @@
 import settings from "~/settings";
+import yn from "~/utils/yn";
 import Command from "~/Command";
 import Users from "~/models/Users";
 import { ICommandContext } from "~/types/ICommandContext";
-import { Message } from "eris";
 import { isGuildChannel } from "~/utils/Utils";
+import { Message } from "eris";
 
 export default class Ban extends Command {
     constructor(category: string) {
         super({
             name: "ban",
             description: "Ban a user from the current guild",
-            usage: "ban <member: string|mention> [reason: string]",
-            example: "ban Kurozero Has been a bad boy >:(",
+            usage: "ban <member: string|mention> <isMember: boolean> <reason: string>",
+            example: "ban Kurozero true Has been a bad boy >:(",
             category: category,
             guildOnly: true,
-            requiredArgs: 2,
+            requiredArgs: 3,
             userPermissions: ["sendMessages", "banMembers"],
             botPermissions: ["readMessages", "sendMessages", "banMembers"]
         });
@@ -26,20 +27,30 @@ export default class Ban extends Command {
             return;
         }
 
-        const userToBan = args.shift();
+        const userToBan = args.shift() || "";
+        const isMember = yn(args.shift(), false);
         const reason = args.join(" ");
-        const member = this.findMember(msg.channel, userToBan!);
 
-        if (!member) {
-            await msg.channel.createMessage("Couldn't find a member");
-            return;
-        }
-
+        let member = null;
         try {
-            await member.ban(7, reason);
+            if (isMember) {
+                member = this.findMember(msg.channel, userToBan!);
 
-            let user = await Users.findOne({ id: member.user.id }).exec();
-            if (!user) user = this.createDBUser(member.user.id);
+                if (!member) {
+                    await msg.channel.createMessage("Couldn't find a member");
+                    return;
+                }
+
+                await member.ban(7, reason);
+            } else {
+                if ((/^\d{17,18}$/u).test(userToBan)) {
+                    return;
+                }
+                await client.banGuildMember(msg.channel.guild.id, "", 7, reason);
+            }
+
+            let user = await Users.findOne({ id: member?.user?.id || userToBan }).exec();
+            if (!user) user = this.createDBUser(member?.user?.id || userToBan);
 
             const timestamp = new Date().toISOString();
             const entry = user.bans.create({ id: this.generateId(), timestamp, by: msg.author.id, reason });
@@ -52,13 +63,13 @@ export default class Ban extends Command {
                         title: "BAN",
                         color: settings.colors.ban,
                         description:
-                            `**Banned:** ${member.user.mention}\n` +
+                            `**Banned:** ${member?.user?.mention || `<@!${userToBan}>`}\n` +
                             `**By:** ${msg.author.mention}\n` +
                             `**Reason:** ${reason}\n` +
                             `User has been banned ${user.bans.length} ${user.bans.length === 1 ? "time" : "times"}`,
                         timestamp,
                         footer: {
-                            text: `ID: ${member.user.id}`
+                            text: `ID: ${member?.user?.id || userToBan}`
                         }
                     }
                 });
@@ -75,11 +86,13 @@ export default class Ban extends Command {
             return;
         }
 
-        try {
-            const dm = await member.user.getDMChannel();
-            await dm.createMessage(`You have been banned from: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
-        } catch (error) {
-            await msg.channel.createMessage("Couldn't DM the banned member");
+        if (isMember) {
+            try {
+                const dm = await member!.user.getDMChannel();
+                await dm.createMessage(`You have been banned from: **${msg.channel.guild.name}**\nBy: **${msg.author.username}**\nWith reason: **${reason}**`);
+            } catch (error) {
+                await msg.channel.createMessage("Couldn't DM the banned member");
+            }
         }
     }
 }
