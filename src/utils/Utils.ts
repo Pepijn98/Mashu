@@ -40,11 +40,28 @@ export type Permissions = Permission[];
 
 const { Permissions, Intents } = Constants;
 
-export const textMute = Permissions.sendMessages | Permissions.sendTTSMessages | Permissions.embedLinks | Permissions.attachFiles | Permissions.addReactions;
+// prettier-ignore
+export const textMute =
+    Permissions.sendMessages |
+    Permissions.sendTTSMessages |
+    Permissions.embedLinks |
+    Permissions.attachFiles |
+    Permissions.addReactions;
 
-export const voiceMute = Permissions.voiceConnect | Permissions.voiceSpeak;
+// prettier-ignore
+export const voiceMute =
+    Permissions.voiceConnect |
+    Permissions.voiceSpeak;
 
-export const clientIntents = Intents.guilds | Intents.guildMembers | Intents.guildBans | Intents.guildEmojis | Intents.guildMembers | Intents.guildMessages | Intents.guildMessageReactions | Intents.directMessages;
+// prettier-ignore
+export const clientIntents =
+    Intents.guilds |
+    Intents.guildMembers |
+    Intents.guildBans |
+    Intents.guildEmojis |
+    Intents.guildMessages |
+    Intents.guildMessageReactions |
+    Intents.directMessages;
 
 export const urlRegex = /[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/giu;
 
@@ -52,26 +69,12 @@ export const urlRegex = /[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA
 export const sleep = (ms: number): Promise<unknown> => new Promise((r) => setTimeout(r, ms));
 
 /** Check whether channel is guild channel */
-export const isGuildChannel = (channel: Channel): channel is GuildChannel => {
-    if (channel instanceof GuildChannel) return true;
-    return false;
-};
-
-export const isGuildTextChannel = (channel: Channel): channel is TextChannel => {
-    if (channel instanceof TextChannel) return true;
-    return false;
-};
-
-export const isGuildVoiceChannel = (channel: Channel): channel is VoiceChannel => {
-    if (channel instanceof VoiceChannel) return true;
-    return false;
-};
+export const isGuildChannel = (channel: Channel): channel is GuildChannel => channel instanceof GuildChannel;
+export const isGuildTextChannel = (channel: Channel): channel is TextChannel => channel instanceof TextChannel;
+export const isGuildVoiceChannel = (channel: Channel): channel is VoiceChannel => channel instanceof VoiceChannel;
 
 /** Check whether channel is DM channel */
-export const isPrivateChannel = (channel: Channel): channel is PrivateChannel => {
-    if (channel instanceof PrivateChannel) return true;
-    return false;
-};
+export const isPrivateChannel = (channel: Channel): channel is PrivateChannel => channel instanceof PrivateChannel;
 
 /** Convert seconds to human readable form */
 export const formatSeconds = (time: number): string => {

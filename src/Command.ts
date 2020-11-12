@@ -42,7 +42,7 @@ export default abstract class Command {
     }
 
     /** Function with all the stuff the command needs to do */
-    public abstract async run(msg: Message, args: string[], context: ICommandContext): Promise<any>;
+    public abstract run(msg: Message, args: string[], context: ICommandContext): Promise<any>;
 
     /** Tries to find the user in the current guild */
     findMember(channel: GuildChannel, uid: string): Member | undefined {
