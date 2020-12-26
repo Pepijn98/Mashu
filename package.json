@@ -40,7 +40,7 @@
         "@kurozero/collection": "^0.5.1",
         "bufferutil": "^4.0.1",
         "chalk": "^4.1.0",
-        "eris": "^0.13.3",
+        "eris": "git+ssh://git@github.com:Pepijn98/eris-pb-custom.git",
         "erlpack": "abalabahaha/erlpack",
         "moment": "^2.29.1",
         "mongoose": "^5.10.11",

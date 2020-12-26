@@ -3,6 +3,13 @@ import settings from "~/settings";
 import Mashu from "./MashuClient";
 import { Channel, Guild, GuildChannel, PrivateChannel, TextChannel, VoiceChannel, Constants } from "eris";
 
+export interface OldMember {
+    roles: string[];
+    nick: string;
+    premiumSince: number;
+    pending?: boolean;
+}
+
 export type Permission =
     | "createInstantInvite"
     | "kickMembers"

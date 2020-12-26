@@ -40,7 +40,7 @@ async function sendWelcome(client: Mashu, guild: Guild, member: Member): Promise
 }
 
 async function muteDetection(client: Mashu, member: Member): Promise<void> {
-    if (settings.options.muteRole) {
+    if (settings.options.muteRole && !member.pending) {
         const user = await Users.findOne({ id: member.user.id }).exec();
         if (user && user.isMuted) {
             const reason = "Member left while being muted, re-added mute role until a moderator unmutes the member";
@@ -71,7 +71,6 @@ export const event: Event = {
             await advertDetection(guild, member);
         } else {
             await sendWelcome(client, guild, member);
-            await member.addRole(settings.options.memberRole, "New member");
             await muteDetection(client, member);
             await updateMemberCount(client, guild);
         }
