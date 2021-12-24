@@ -27,7 +27,6 @@ const settings: Settings = {
     },
     database: {
         host: "localhost",
-        port: 27017,
         name: "",
         user: "",
         pwd: ""

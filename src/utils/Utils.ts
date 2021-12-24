@@ -1,7 +1,7 @@
 import Counters from "~/models/Counters";
 import settings from "~/settings";
 import Mashu from "./MashuClient";
-import { Channel, Guild, GuildChannel, PrivateChannel, TextChannel, VoiceChannel, Constants } from "eris";
+import { Channel, Guild, GuildChannel, PrivateChannel, TextChannel, VoiceChannel, Constants, PossiblyUncachedTextableChannel, TextableChannel, Message } from "eris";
 
 export interface OldMember {
     roles: string[];
@@ -82,6 +82,10 @@ export const isGuildVoiceChannel = (channel: Channel): channel is VoiceChannel =
 
 /** Check whether channel is DM channel */
 export const isPrivateChannel = (channel: Channel): channel is PrivateChannel => channel instanceof PrivateChannel;
+
+export const checkUncachedChannel = (channel: PossiblyUncachedTextableChannel): TextableChannel => channel as TextableChannel;
+
+export const isCached = (message: Message<PossiblyUncachedTextableChannel>): message is Message<TextableChannel> => (message.channel as any).type !== undefined;
 
 /** Convert seconds to human readable form */
 export const formatSeconds = (time: number): string => {

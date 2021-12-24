@@ -54,7 +54,7 @@ export default class Ban extends Command {
                     await msg.channel.createMessage("Couldn't DM the banned member");
                 }
             } else {
-                if (!(/^\d{17,18}$/u).test(userToBan)) {
+                if (!/^\d{17,18}$/u.test(userToBan)) {
                     await msg.channel.createMessage("Invalid user id");
                     return;
                 }

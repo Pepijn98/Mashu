@@ -1,5 +1,5 @@
 import { MongooseArray } from "./Utils";
-import { Document } from "mongoose";
+import { Document, ObjectId } from "mongoose";
 
 export interface IViolation {
     id: string;
@@ -30,4 +30,4 @@ export interface IUser {
     expireAt?: Date;
 }
 
-export type UserDoc = IUser & Document;
+export type UserDoc = IUser & Document & { _id: ObjectId };

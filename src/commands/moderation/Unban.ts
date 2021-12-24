@@ -30,7 +30,7 @@ export default class Unban extends Command {
         const reason = args.join(" ").trim();
 
         const bans = await msg.channel.guild.getBans();
-        const entry = bans.find((e) => (/^\d{17,18}$/u).test(userToUnban) ? e.user.id === userToUnban : e.user.username.toLowerCase().includes(userToUnban.toLowerCase()));
+        const entry = bans.find((e) => (/^\d{17,18}$/u.test(userToUnban) ? e.user.id === userToUnban : e.user.username.toLowerCase().includes(userToUnban.toLowerCase())));
 
         if (!entry) {
             await msg.channel.createMessage("Couldn't find a user with that name or id on the ban list");

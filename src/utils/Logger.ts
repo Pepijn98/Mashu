@@ -12,9 +12,7 @@ export default class Logger {
             level: "warn",
             format: format.combine(
                 format.timestamp(),
-                format.printf(
-                    (log) => `${moment(log.timestamp).format("DD/MM/YYYY, hh:mm:ss")} ${chalk.black.bgGreen(`[${log.label}]`)} ${this._getColored(log.level)}: ${log.message}`
-                )
+                format.printf((log) => `${moment(log.timestamp).format("DD/MM/YYYY, hh:mm:ss")} ${chalk.black.bgGreen(`[${log.label}]`)} ${this._getColored(log.level)}: ${log.message}`)
             ),
             transports: [
                 new transports.Console({

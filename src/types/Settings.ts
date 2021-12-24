@@ -15,7 +15,7 @@ export interface IColors {
 
 export interface IDatabase {
     host: string;
-    port: number;
+    // port: number;
     name: string;
     user: string;
     pwd: string;

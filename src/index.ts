@@ -11,7 +11,7 @@ import CommandLoader from "./utils/CommandLoader";
 import EventLoader from "./utils/EventLoader";
 import Logger from "./utils/Logger";
 import Users from "./models/Users";
-import { updateMemberCount, clientIntents } from "./utils/Utils";
+import { updateMemberCount, clientIntents, isCached } from "./utils/Utils";
 
 // Whether the bot is ready or not
 let ready = false;
@@ -72,11 +72,9 @@ function startDBInterval(): void {
 client.on("ready", async () => {
     if (!ready) {
         // Connect to mongodb
-        await mongoose.connect(`mongodb://${settings.database.user}:${settings.database.pwd}@${settings.database.host}:${settings.database.port}/${settings.database.name}`, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useFindAndModify: false
-        });
+        await mongoose.connect(
+            `mongodb+srv://${settings.database.user}:${settings.database.pwd}@${settings.database.host}/${settings.database.name}?authSource=${settings.database.name}&replicaSet=atlas-z1twx1-shard-0&readPreference=primary&appname=Mashu%20Bot&ssl=true`
+        );
 
         // Load commands
         client.commands = await commandLoader.load(path.join(__dirname, "commands"));
@@ -105,6 +103,7 @@ client.on("ready", async () => {
 // Handle commands
 client.on("messageCreate", async (msg) => {
     if (!ready) return; // Bot not ready yet
+    if (!isCached(msg)) return;
     if (!msg.author) return; // Probably system message
     if (msg.author.discriminator === "0000") return; // Probably a webhook
     if (msg.author.id === client.user.id) return;

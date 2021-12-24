@@ -50,9 +50,7 @@ export default abstract class Command {
             return channel.guild.members.get(/^<@!?\d{17,18}>/u.test(uid) ? uid.replace(/<@!?/u, "").replace(">", "") : uid);
         } else if (uid.length <= 33) {
             const isMemberName = (name: string, something: string): boolean => name === something || name.startsWith(something) || name.includes(something);
-            return channel.guild.members.find((m) =>
-                m.nick && isMemberName(m.nick.toLowerCase(), uid.toLowerCase()) ? true : isMemberName(m.user.username.toLowerCase(), uid.toLowerCase())
-            );
+            return channel.guild.members.find((m) => (m.nick && isMemberName(m.nick.toLowerCase(), uid.toLowerCase()) ? true : isMemberName(m.user.username.toLowerCase(), uid.toLowerCase())));
         }
     }
 
@@ -66,10 +64,10 @@ export default abstract class Command {
             id,
             isBanned: false,
             isMuted: false,
-            warns: new MongooseArray(),
-            bans: new MongooseArray(),
-            kicks: new MongooseArray(),
-            notes: new MongooseArray()
+            warns: new MongooseArray([]),
+            bans: new MongooseArray([]),
+            kicks: new MongooseArray([]),
+            notes: new MongooseArray([])
         } as IUser);
     }
 }
